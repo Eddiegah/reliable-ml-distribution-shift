@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# raw and processed data are large and not meant for git — see data/README.md
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# experiment logs / model artifacts
+experiments/*
+!experiments/.gitkeep
+*.mlflow/
+mlruns/
+
+.env

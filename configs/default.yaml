@@ -1,0 +1,28 @@
+# Values marked TBD are open questions for the lab kickoff meeting
+# (see Section 11 of the research proposal). Fill these in before Phase 1.
+
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  target_variable: TBD        # e.g. BRFSS diabetes indicator (DIABETE3/DIABETE4 — name changed across years)
+  train_years: TBD            # e.g. [2015, 2016, 2017]
+  val_years: TBD               # e.g. [2018]
+  test_years: TBD              # later, shifted years — e.g. [2021, 2022]
+  adaptation_sample_years: TBD # small labeled slice from test_years, held out from final evaluation
+
+model:
+  seed: 42
+  baselines:
+    - logistic_regression
+    - xgboost
+
+calibration:
+  method: isotonic   # or platt
+
+conformal:
+  method: split_conformal
+  alpha: 0.1          # target miscoverage rate (90% coverage)
+
+paths:
+  reports_dir: reports
+  experiments_dir: experiments
