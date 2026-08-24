@@ -1,6 +1,7 @@
 # Reliable ML Under Distribution Shift
 ### Uncertainty-Aware Health Risk Prediction
 
+![CI](https://github.com/Eddiegah/reliable-ml-distribution-shift/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-active--research-orange)
@@ -23,7 +24,7 @@ standard evaluation does: when the model's confidence is high, is it actually
 mechanism for flagging unreliable predictions, and lightweight recalibration
 is tested as the fix once shift is detected.
 
-📄 Full proposal: [`docs/proposal.docx`](docs/proposal.docx)
+📄 Full proposal: [`docs/PROPOSAL.md`](docs/PROPOSAL.md) (readable on GitHub) · [`docs/proposal.docx`](docs/proposal.docx) (formatted download)
 
 ---
 
@@ -32,6 +33,20 @@ is tested as the fix once shift is detected.
 > When a health-risk prediction model encounters distribution shift, can
 > uncertainty estimation reliably identify predictions that are likely to be
 > incorrect — and can adaptation methods restore reliable performance?
+
+## Related work
+
+This isn't the first study of ML reliability under shift — it targets a
+specific, underexplored corner of it: naturally occurring temporal shift in
+tabular healthcare survey data, rather than synthetic corruption on image/text
+benchmarks. Grounded in:
+
+- Ovadia et al. (2019) — uncertainty estimates degrade under dataset shift
+- Guo et al. (2017); Niculescu-Mizil & Caruana (2005) — post-hoc calibration is effective in-distribution, less studied under shift
+- Vovk, Gammerman & Shafer (2005); Tibshirani et al. (2019) — conformal prediction's coverage guarantees break under covariate shift
+- Koh et al. (2021) — WILDS, the standard shift benchmark, is mostly image/text
+
+Full references and discussion in [`docs/PROPOSAL.md`](docs/PROPOSAL.md#1-background-and-related-work).
 
 ## Status — open items before Phase 1
 
@@ -70,6 +85,18 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+## Development & tests
+
+All model-agnostic modules (metrics, calibration, conformal prediction,
+baseline training, adaptation, temporal splitting) are covered by a passing
+test suite — CI runs it on every push.
+
+```bash
+pip install -r requirements-dev.txt
+ruff check .
+pytest -v
+```
+
 ## Repo layout
 
 ```
@@ -79,6 +106,7 @@ src/models/       baseline training (Logistic Regression, XGBoost)
 src/uncertainty/  calibration, split conformal prediction, failure-detection metrics
 src/adaptation/   recalibration on a held-out target-period sample
 src/evaluation/   performance/calibration metrics, shift-degradation comparison
+tests/            pytest suite for every model-agnostic module
 data/raw/         downloaded BRFSS files (gitignored)
 data/processed/   cleaned/split datasets (gitignored)
 reports/          final write-up and figures
@@ -96,4 +124,4 @@ an issue or reach out directly.
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Released under the [MIT License](LICENSE). See [`CITATION.cff`](CITATION.cff) for citation.

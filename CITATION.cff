@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you build on this work, please cite it as below."
+title: "Reliable Machine Learning Under Distribution Shift: Uncertainty-Aware Health Risk Prediction"
+authors:
+  - family-names: Gah
+    given-names: Edmund Eric
+    email: gahedmund146@gmail.com
+date-released: 2026-08-24
+license: MIT
+repository-code: "https://github.com/Eddiegah/reliable-ml-distribution-shift"
+keywords:
+  - machine-learning
+  - uncertainty-quantification
+  - distribution-shift
+  - calibration
+  - conformal-prediction
+  - healthcare-ai

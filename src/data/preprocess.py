@@ -30,14 +30,16 @@ def temporal_split(
     test_years: list[int],
     adaptation_sample_years: list[int] | None = None,
 ) -> dict[str, pd.DataFrame]:
+    test_mask = df["survey_year"].isin(test_years)
     splits = {
         "train": df[df["survey_year"].isin(train_years)],
         "val": df[df["survey_year"].isin(val_years)],
-        "test": df[df["survey_year"].isin(test_years)],
     }
     if adaptation_sample_years:
         adapt_mask = df["survey_year"].isin(adaptation_sample_years)
         splits["adapt"] = df[adapt_mask]
         # keep the adaptation slice out of final test evaluation
-        splits["test"] = splits["test"][~adapt_mask]
+        splits["test"] = df[test_mask & ~adapt_mask]
+    else:
+        splits["test"] = df[test_mask]
     return splits

@@ -3,6 +3,8 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+.pytest_cache/
+.ruff_cache/
 
 # raw and processed data are large and not meant for git — see data/README.md
 data/raw/*

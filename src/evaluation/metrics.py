@@ -1,7 +1,14 @@
+from itertools import pairwise
+
 import numpy as np
 from sklearn.metrics import (
-    roc_auc_score, average_precision_score, brier_score_loss,
-    accuracy_score, precision_score, recall_score, f1_score,
+    accuracy_score,
+    average_precision_score,
+    brier_score_loss,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
 
 
@@ -10,7 +17,7 @@ def expected_calibration_error(y_true, y_prob, n_bins: int = 10) -> float:
     y_prob = np.asarray(y_prob)
     bin_edges = np.linspace(0.0, 1.0, n_bins + 1)
     ece = 0.0
-    for lo, hi in zip(bin_edges[:-1], bin_edges[1:]):
+    for lo, hi in pairwise(bin_edges):
         in_bin = (y_prob > lo) & (y_prob <= hi)
         if not np.any(in_bin):
             continue
