@@ -72,6 +72,20 @@ Everything above studies temporal shift (same population, later years). This sec
 
 Raw discrimination (AUROC) barely moves — this echoes the temporal-shift finding. But calibration and conformal coverage tell a different story, and this is the more informative result: **geography is a larger shift than six years of time was.** The conformal coverage drop for the South (90.0% → 87.3%, a 2.7-point loss) is roughly 9x the drop seen under the full 6-year temporal shift (90.0% → 89.7%, Table above). Calibration error for the South is nearly 18x worse than in-region. This lines up with a real, independently documented pattern: the Southern US has substantially higher diabetes prevalence than the Northeast or West (16.9% vs. ~12.3% in this 2023 data — consistent with the CDC's well-known "diabetes belt"), so a model calibrated on the Northeast's lower base rate is systematically overconfident applied to the South's higher one. Failure-detection AUROC still holds up reasonably everywhere (0.80–0.82), so uncertainty degrades gracefully rather than collapsing — but the conformal coverage guarantee, specifically, comes measurably closer to breaking down here than anywhere in the temporal analysis. Full numbers in [`reports/geographic_shift_results.json`](geographic_shift_results.json).
 
+### Weighted conformal prediction partially recovers the lost coverage
+
+Given that geographic shift measurably breaks the coverage guarantee, does the fix the theory prescribes actually help? Applying weighted conformal prediction (Tibshirani, Barber, Candès, & Ramdas, 2019) — reweighting calibration scores by an estimated covariate density ratio between the Northeast calibration set and each target region — to the same setup:
+
+![Weighted conformal](figures/weighted_conformal.png)
+
+| Region | Unweighted coverage | Weighted coverage | Mean set size (unweighted → weighted) |
+|---|---|---|---|
+| Midwest | 88.6% | **89.6%** | 1.06 → 1.09 |
+| South | 87.3% | **88.7%** | 1.07 → 1.11 |
+| West | 90.2% | 90.0% | 1.05 → 1.04 |
+
+Weighting closes roughly half the South's coverage gap (2.7 points → 1.3 points) and nearly all of the Midwest's (1.4 points → 0.4 points), at the cost of modestly larger prediction sets — the expected trade-off, since recovering coverage under shift means being less specific about which class is predicted. For the West, where there was barely any gap to begin with, weighting has essentially no effect either way, which is itself a useful sanity check: the method doesn't manufacture a problem where none exists. It doesn't fully close the South's gap, which makes sense — the density-ratio estimate is only as good as the domain classifier estimating it (here, a simple logistic regression on the same 15 features), and a two-region covariate shift this large is a genuinely hard estimation problem. Full numbers in [`reports/weighted_conformal_results.json`](weighted_conformal_results.json).
+
 ## Discussion
 
 The central hypothesis — that calibrated/conformal uncertainty identifies unreliable predictions under shift, and that lightweight recalibration recovers lost calibration — holds up on this first pass, but the *shift itself* is smaller than the proposal anticipated on average, for the temporal dimension (Section 9, Risk 1). That's a legitimate finding, not a setback: it says something real about how BRFSS-scale national survey data behaves over a 6-year, COVID-spanning window for this particular prediction task. Both the subgroup and geographic analyses above complicate the "mild shift" story usefully, though, and in the same direction: the aggregate temporal metric was masking a real degradation both within the 65+ subgroup and, independently, across geography — the South's conformal coverage (87.3%) and calibration error (0.018 ECE) are measurably closer to a visible breakdown than anything the temporal shift alone produced. That's Risk 3's predicted failure mode, made observable by choosing the right shift dimension rather than by waiting for more years of data to pass.
@@ -100,4 +114,6 @@ python scripts/run_subgroup_analysis.py
 python scripts/make_subgroup_figure.py
 python scripts/run_geographic_shift.py
 python scripts/make_geographic_figure.py
+python scripts/run_weighted_conformal.py
+python scripts/make_weighted_conformal_figure.py
 ```

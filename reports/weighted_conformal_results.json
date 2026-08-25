@@ -1,0 +1,35 @@
+{
+  "train_region": "Northeast",
+  "year": 2023,
+  "alpha": 0.1,
+  "by_region": {
+    "Northeast": {
+      "n": 19018,
+      "unweighted_coverage": 0.9000420654117152,
+      "unweighted_mean_set_size": 1.048848459354296,
+      "weighted_coverage": 0.9000420654117152,
+      "weighted_mean_set_size": 1.048848459354296
+    },
+    "Midwest": {
+      "n": 115186,
+      "unweighted_coverage": 0.8862274929244873,
+      "unweighted_mean_set_size": 1.0619780181619294,
+      "weighted_coverage": 0.8956296772177175,
+      "weighted_mean_set_size": 1.084775927630094
+    },
+    "South": {
+      "n": 109352,
+      "unweighted_coverage": 0.8727320945204478,
+      "unweighted_mean_set_size": 1.072655278367108,
+      "weighted_coverage": 0.8869156485478089,
+      "weighted_mean_set_size": 1.1075426146755432
+    },
+    "West": {
+      "n": 110078,
+      "unweighted_coverage": 0.9016606406366394,
+      "unweighted_mean_set_size": 1.047230145896546,
+      "weighted_coverage": 0.899589382074529,
+      "weighted_mean_set_size": 1.0423427024473555
+    }
+  }
+}

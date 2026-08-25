@@ -110,8 +110,12 @@ years was:** training on Northeast respondents (2023) and evaluating on the
 South, conformal coverage drops 90.0% → **87.3%** — roughly 9x the drop seen
 under the full 6-year temporal shift — and calibration error is nearly 18x
 worse, consistent with the South's well-documented higher diabetes
-prevalence. See [`reports/report.md`](reports/report.md) for the complete
-discussion, all seven figures, and limitations.
+prevalence. **Weighted conformal prediction (Tibshirani et al., 2019)
+recovers about half of that lost coverage** (South: 87.3% → 88.7%) at the
+cost of modestly larger prediction sets — the theoretically-prescribed fix
+works, partially, exactly as expected. See
+[`reports/report.md`](reports/report.md) for the complete discussion, all
+eight figures, and limitations.
 
 ## Roadmap
 
@@ -120,7 +124,7 @@ discussion, all seven figures, and limitations.
 | 0 | Literature review | `docs/` |
 | 1 | Data acquisition & preprocessing | `scripts/download_brfss.py`, `scripts/build_dataset.py` |
 | 2–5 | Baselines, shift eval, calibration/conformal, adaptation | `scripts/run_pipeline.py` |
-| ext. | Subgroup fairness, geographic shift | `scripts/run_subgroup_analysis.py`, `scripts/run_geographic_shift.py` |
+| ext. | Subgroup fairness, geographic shift, weighted conformal | `scripts/run_subgroup_analysis.py`, `scripts/run_geographic_shift.py`, `scripts/run_weighted_conformal.py` |
 | 6 | Write-up | `reports/` |
 
 ## Quickstart
@@ -131,6 +135,7 @@ python scripts/build_dataset.py     # extract + clean -> data/processed/brfss_cl
 python scripts/run_pipeline.py      # baselines, shift eval, calibration, conformal, adaptation
 python scripts/run_subgroup_analysis.py   # extension: fairness by sex/age
 python scripts/run_geographic_shift.py    # extension: shift by US Census region
+python scripts/run_weighted_conformal.py  # extension: does reweighting recover the lost coverage?
 ```
 
 ## Setup
