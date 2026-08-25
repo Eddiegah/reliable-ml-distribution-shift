@@ -25,6 +25,7 @@ mechanism for flagging unreliable predictions, and lightweight recalibration
 is tested as the fix once shift is detected.
 
 📄 Full proposal: [`docs/PROPOSAL.md`](docs/PROPOSAL.md) (readable on GitHub) · [`docs/proposal.docx`](docs/proposal.docx) (formatted download)
+📝 **Paper draft (in progress):** [`docs/paper_draft.md`](docs/paper_draft.md) — Abstract through Section 4.4 reflect completed experiments on real data; Section 4.5 (deep ensembles) is pending GPU access.
 
 ---
 
