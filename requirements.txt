@@ -11,6 +11,7 @@ scipy>=1.11
 matplotlib>=3.7
 seaborn>=0.12
 mapie>=1.0
+fairlearn>=0.10
 pyyaml>=6.0
 jupyter>=1.0
 torch>=2.2

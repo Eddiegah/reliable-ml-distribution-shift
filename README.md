@@ -94,12 +94,17 @@ of actually running on the hardware.
 
 ![Risk-coverage curve](reports/figures/risk_coverage_curve.png)
 
-Headline finding: **the shift is real but mild** over this window, and the
+Headline finding: **the shift is real but mild on average**, and the
 model's uncertainty is genuinely informative regardless — restricting to its
 most-confident 20% of 2023 predictions yields under 1% error (full curve
 above). Recalibrating on a small 2021 sample tightens calibration further
-(ECE 0.005 → 0.001) at no cost to discrimination. See `reports/report.md`
-for the complete discussion, all four figures, and limitations.
+(ECE 0.005 → 0.001) at no cost to discrimination.
+
+**But "mild" is an average that hides a real subgroup gap:** AUROC on the
+2023 test set falls from 0.836 (age 18–44) to 0.811 (45–64) to **0.750**
+(65+) — an equalized-odds difference 27x larger than the (negligible) gap by
+sex. See [`reports/report.md`](reports/report.md) for the complete
+discussion, all five figures, and limitations.
 
 ## Roadmap
 
