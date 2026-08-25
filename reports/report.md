@@ -57,9 +57,24 @@ Recalibrating on a small labeled sample closer to the test period (2021) monoton
 
 The headline "shift is mild" finding is an average. Broken out by subgroup on the 2023 test set, sex shows almost no gap (AUROC 0.830 female vs. 0.824 male, equalized-odds difference 0.005), but age band shows a real, substantial one: AUROC falls from **0.836** (18–44) to **0.811** (45–64) to **0.750** (65+) — an equalized-odds difference of **0.138**, roughly 27x the sex gap. The model is meaningfully less discriminative for older adults specifically under the shifted 2023 data, even though the all-ages aggregate looked fine. This is exactly the kind of thing an aggregate-only evaluation would miss, and it's a legitimate fairness finding worth its own discussion in the paper, not just a footnote — full numbers in [`reports/subgroup_fairness.json`](subgroup_fairness.json).
 
+## Geographic shift: a genuinely larger shift, isolated from time
+
+Everything above studies temporal shift (same population, later years). This section isolates a second, independent shift dimension: geography, within a single year (2023), so there's no time confound. XGBoost is trained on Northeast respondents only, then evaluated on a held-out Northeast slice (in-region reference) versus the other three US Census regions.
+
+![Geographic shift](figures/geographic_shift.png)
+
+| Region | AUROC | ECE (calibrated on Northeast) | Conformal coverage (target 90%) |
+|---|---|---|---|
+| Northeast (in-region) | 0.827 | 0.000 | 90.0% |
+| Midwest | 0.819 | 0.007 | 88.6% |
+| South | 0.816 | **0.018** | **87.3%** |
+| West | 0.827 | 0.004 | 90.2% |
+
+Raw discrimination (AUROC) barely moves — this echoes the temporal-shift finding. But calibration and conformal coverage tell a different story, and this is the more informative result: **geography is a larger shift than six years of time was.** The conformal coverage drop for the South (90.0% → 87.3%, a 2.7-point loss) is roughly 9x the drop seen under the full 6-year temporal shift (90.0% → 89.7%, Table above). Calibration error for the South is nearly 18x worse than in-region. This lines up with a real, independently documented pattern: the Southern US has substantially higher diabetes prevalence than the Northeast or West (16.9% vs. ~12.3% in this 2023 data — consistent with the CDC's well-known "diabetes belt"), so a model calibrated on the Northeast's lower base rate is systematically overconfident applied to the South's higher one. Failure-detection AUROC still holds up reasonably everywhere (0.80–0.82), so uncertainty degrades gracefully rather than collapsing — but the conformal coverage guarantee, specifically, comes measurably closer to breaking down here than anywhere in the temporal analysis. Full numbers in [`reports/geographic_shift_results.json`](geographic_shift_results.json).
+
 ## Discussion
 
-The central hypothesis — that calibrated/conformal uncertainty identifies unreliable predictions under shift, and that lightweight recalibration recovers lost calibration — holds up on this first pass, but the *shift itself* is smaller than the proposal anticipated on average (Section 9, Risk 1). That's a legitimate finding, not a setback: it says something real about how BRFSS-scale national survey data behaves over a 6-year, COVID-spanning window for this particular prediction task. The subgroup analysis above complicates the "mild shift" story usefully, though — it isn't mild for everyone, and the aggregate metric was masking that. It sets up a natural next question: does a *larger* shift (a different geographic split, or comparing states with very different healthcare access) push the conformal-coverage guarantee further, to where it visibly breaks down the way it already has, in effect, for the 65+ subgroup? That would make Risk 3's predicted failure mode observable in the aggregate too, not just within one subgroup.
+The central hypothesis — that calibrated/conformal uncertainty identifies unreliable predictions under shift, and that lightweight recalibration recovers lost calibration — holds up on this first pass, but the *shift itself* is smaller than the proposal anticipated on average, for the temporal dimension (Section 9, Risk 1). That's a legitimate finding, not a setback: it says something real about how BRFSS-scale national survey data behaves over a 6-year, COVID-spanning window for this particular prediction task. Both the subgroup and geographic analyses above complicate the "mild shift" story usefully, though, and in the same direction: the aggregate temporal metric was masking a real degradation both within the 65+ subgroup and, independently, across geography — the South's conformal coverage (87.3%) and calibration error (0.018 ECE) are measurably closer to a visible breakdown than anything the temporal shift alone produced. That's Risk 3's predicted failure mode, made observable by choosing the right shift dimension rather than by waiting for more years of data to pass.
 
 This also positions the work relative to the closest prior study design: Guo et al. (2022, 2023) split MIMIC-IV hospital records into year groups to study the same kind of temporal shift, but their focus is whether *adaptation* (domain generalization, foundation-model pretraining) recovers performance — not whether the model's own uncertainty can be trusted to flag failure in the first place. That's the gap this project is aimed at, on a different data modality (national population survey, not hospital EHR).
 
@@ -81,4 +96,8 @@ python scripts/download_brfss.py
 python scripts/build_dataset.py
 python scripts/run_pipeline.py
 python scripts/make_figures.py
+python scripts/run_subgroup_analysis.py
+python scripts/make_subgroup_figure.py
+python scripts/run_geographic_shift.py
+python scripts/make_geographic_figure.py
 ```

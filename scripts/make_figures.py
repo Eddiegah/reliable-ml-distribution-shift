@@ -16,7 +16,7 @@ from sklearn.calibration import calibration_curve
 from sklearn.metrics import roc_curve
 
 from src.adaptation.recalibrate import recalibrate_on_target
-from src.data.preprocess import impute_missing, temporal_split
+from src.data.preprocess import NON_FEATURE_COLUMNS, impute_missing, temporal_split
 from src.evaluation.metrics import performance_report
 from src.models.baselines import train_baselines
 from src.uncertainty.calibration import calibrate, predict_proba_positive
@@ -37,7 +37,7 @@ def main():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
 
     df = pd.read_parquet("data/processed/brfss_clean.parquet")
-    feature_cols = [c for c in df.columns if c not in ("survey_year", "diabetes")]
+    feature_cols = [c for c in df.columns if c not in NON_FEATURE_COLUMNS]
     splits = temporal_split(
         df,
         train_years=config["data"]["train_years"],

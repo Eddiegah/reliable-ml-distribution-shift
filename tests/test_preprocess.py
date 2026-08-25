@@ -29,6 +29,7 @@ def test_recode_features_applies_rf_convention_and_raw_convention_correctly():
         "age_group": [3, 14],     # 14 is missing/dk -> NaN
         "education": [6, 9],      # 9 is refused -> NaN
         "survey_year": [2017, 2017],
+        "state_fips": [9, 6],     # passthrough metadata, not recoded
     })
     out = recode_features(df)
 
@@ -40,6 +41,7 @@ def test_recode_features_applies_rf_convention_and_raw_convention_correctly():
     assert pd.isna(out["physical_health_days"].iloc[1])
     assert out["sex_female"].tolist() == [0, 1]
     assert pd.isna(out["age_group"].iloc[1])
+    assert out["state_fips"].tolist() == [9, 6]
 
 
 def test_impute_missing_fills_with_train_medians_not_test_medians():

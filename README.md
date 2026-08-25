@@ -103,8 +103,15 @@ above). Recalibrating on a small 2021 sample tightens calibration further
 **But "mild" is an average that hides a real subgroup gap:** AUROC on the
 2023 test set falls from 0.836 (age 18–44) to 0.811 (45–64) to **0.750**
 (65+) — an equalized-odds difference 27x larger than the (negligible) gap by
-sex. See [`reports/report.md`](reports/report.md) for the complete
-discussion, all five figures, and limitations.
+sex.
+
+**And geography, isolated from time, is a genuinely larger shift than 6
+years was:** training on Northeast respondents (2023) and evaluating on the
+South, conformal coverage drops 90.0% → **87.3%** — roughly 9x the drop seen
+under the full 6-year temporal shift — and calibration error is nearly 18x
+worse, consistent with the South's well-documented higher diabetes
+prevalence. See [`reports/report.md`](reports/report.md) for the complete
+discussion, all seven figures, and limitations.
 
 ## Roadmap
 
@@ -113,14 +120,17 @@ discussion, all five figures, and limitations.
 | 0 | Literature review | `docs/` |
 | 1 | Data acquisition & preprocessing | `scripts/download_brfss.py`, `scripts/build_dataset.py` |
 | 2–5 | Baselines, shift eval, calibration/conformal, adaptation | `scripts/run_pipeline.py` |
+| ext. | Subgroup fairness, geographic shift | `scripts/run_subgroup_analysis.py`, `scripts/run_geographic_shift.py` |
 | 6 | Write-up | `reports/` |
 
 ## Quickstart
 
 ```bash
-python scripts/download_brfss.py   # ~450 MB, four BRFSS years, public CDC data
-python scripts/build_dataset.py    # extract + clean -> data/processed/brfss_clean.parquet
-python scripts/run_pipeline.py     # baselines, shift eval, calibration, conformal, adaptation
+python scripts/download_brfss.py    # ~450 MB, four BRFSS years, public CDC data
+python scripts/build_dataset.py     # extract + clean -> data/processed/brfss_clean.parquet
+python scripts/run_pipeline.py      # baselines, shift eval, calibration, conformal, adaptation
+python scripts/run_subgroup_analysis.py   # extension: fairness by sex/age
+python scripts/run_geographic_shift.py    # extension: shift by US Census region
 ```
 
 ## Setup

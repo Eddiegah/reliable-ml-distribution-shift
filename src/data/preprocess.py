@@ -10,6 +10,14 @@ from src.data.brfss_schema import FEATURE_COLUMNS, TARGET_COLUMN
 
 CHUNKSIZE = 100_000
 
+# columns present in the clean dataset that are never model features:
+# survey_year/diabetes are split/target metadata, state_fips is geographic
+# metadata for the extension in src/data/geography.py. Every script that
+# computes feature_cols excludes these explicitly and reuses this constant,
+# so adding future metadata columns can't silently change what "features"
+# means for an already-reported experiment.
+NON_FEATURE_COLUMNS = ("survey_year", "diabetes", "state_fips")
+
 
 def extract_year(year: int, raw_dir: str = "data/raw") -> pd.DataFrame:
     """Read one year's raw .xpt in chunks, keeping only the columns this
@@ -61,6 +69,7 @@ def recode_features(df: pd.DataFrame) -> pd.DataFrame:
     out["education"] = df["education"].where(df["education"].between(1, 6))
 
     out["survey_year"] = df["survey_year"]
+    out["state_fips"] = df["state_fips"]  # metadata only, see brfss_schema.py
     return out
 
 
@@ -84,7 +93,7 @@ def impute_missing(
     the same values for val/adapt/test to avoid leaking their distributions
     into the fill values."""
     if feature_cols is None:
-        feature_cols = [c for c in df.columns if c not in ("survey_year", "diabetes")]
+        feature_cols = [c for c in df.columns if c not in NON_FEATURE_COLUMNS]
     if medians is None:
         medians = {c: float(df[c].median()) for c in feature_cols}
     out = df.copy()

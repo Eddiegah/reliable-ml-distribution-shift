@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import numpy as np
 import pandas as pd
 
-from src.data.preprocess import impute_missing, temporal_split
+from src.data.preprocess import NON_FEATURE_COLUMNS, impute_missing, temporal_split
 from src.evaluation.metrics import performance_report
 from src.models.neural import ensemble_predict, get_device, mc_dropout_predict, train_deep_ensemble
 from src.uncertainty.failure_detection import failure_detection_auroc
@@ -42,7 +42,7 @@ def main():
     print(f"device: {device}  epochs: {args.epochs}  ensemble members: {args.n_members}")
 
     df = pd.read_parquet("data/processed/brfss_clean.parquet")
-    feature_cols = [c for c in df.columns if c not in ("survey_year", "diabetes")]
+    feature_cols = [c for c in df.columns if c not in NON_FEATURE_COLUMNS]
     splits = temporal_split(
         df,
         train_years=config["data"]["train_years"],

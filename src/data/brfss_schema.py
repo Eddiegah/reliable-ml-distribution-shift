@@ -39,6 +39,11 @@ FEATURE_COLUMNS = {
     "sex": {2017: "SEX", 2019: "SEXVAR", 2021: "SEXVAR", 2023: "SEXVAR"},
     "age_group": {y: "_AGEG5YR" for y in (2017, 2019, 2021, 2023)},
     "education": {y: "EDUCA" for y in (2017, 2019, 2021, 2023)},
+    # kept as metadata for the geographic-shift extension (src/data/geography.py),
+    # NOT a model feature — every feature_cols computation elsewhere excludes it
+    # explicitly, same as survey_year/diabetes, so this addition does not change
+    # any previously reported temporal/subgroup result.
+    "state_fips": {y: "_STATE" for y in (2017, 2019, 2021, 2023)},
 }
 
 SUPPORTED_YEARS = (2017, 2019, 2021, 2023)
