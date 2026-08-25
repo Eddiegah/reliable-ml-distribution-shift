@@ -41,12 +41,16 @@ specific, underexplored corner of it: naturally occurring temporal shift in
 tabular healthcare survey data, rather than synthetic corruption on image/text
 benchmarks. Grounded in:
 
-- Ovadia et al. (2019) — uncertainty estimates degrade under dataset shift
+- Ovadia et al. (2019), Lakshminarayanan et al. (2017), Gal & Ghahramani (2016) — uncertainty estimates (including deep ensembles and MC-dropout, both implemented here) degrade under dataset shift
 - Guo et al. (2017); Niculescu-Mizil & Caruana (2005) — post-hoc calibration is effective in-distribution, less studied under shift
 - Vovk, Gammerman & Shafer (2005); Tibshirani et al. (2019) — conformal prediction's coverage guarantees break under covariate shift
 - Koh et al. (2021) — WILDS, the standard shift benchmark, is mostly image/text
+- Malinin et al. (2021) — uncertainty specifically for gradient-boosted trees, this project's primary model family
+- Guo et al. (2022, 2023) — the closest prior design: MIMIC-IV split into year groups to study temporal shift directly, though on hospital EHR data and centered on adaptation rather than uncertainty-as-failure-detector
 
-Full references and discussion in [`docs/PROPOSAL.md`](docs/PROPOSAL.md#1-background-and-related-work).
+All 11 references verified against primary sources (not from memory) — full
+list with arXiv/DOI links in
+[`docs/PROPOSAL.md`](docs/PROPOSAL.md#1-background-and-related-work).
 
 ## Status
 

@@ -19,9 +19,11 @@ The plan is intentionally scoped to a tractable core (v1) that one researcher ca
 
 ## 1. Background and related work
 
-Prior work shows that standard classifiers become both less accurate and poorly calibrated under dataset shift, and that common uncertainty estimates degrade in reliability precisely when they are needed most (Ovadia et al., 2019). Post-hoc calibration methods such as Platt scaling and isotonic regression are effective in-distribution, but their behavior under shift is comparatively under-studied (Guo et al., 2017; Niculescu-Mizil & Caruana, 2005). Conformal prediction offers distribution-free coverage guarantees under exchangeability (Vovk, Gammerman, & Shafer, 2005), but these guarantees provably degrade under covariate shift, which has motivated weighted and adaptive variants (Tibshirani, Barber, Candès, & Ramdas, 2019). Large empirical benchmarks in this space, such as WILDS (Koh et al., 2021), focus mainly on image and text domains with synthetic or domain-generalization-style shift.
+Prior work shows that standard classifiers become both less accurate and poorly calibrated under dataset shift, and that common uncertainty estimates — including deep ensembles and MC-dropout, the two strongest methods in that comparison — degrade in reliability precisely when they are needed most (Ovadia et al., 2019; Lakshminarayanan et al., 2017; Gal & Ghahramani, 2016). Post-hoc calibration methods such as Platt scaling and isotonic regression are effective in-distribution, but their behavior under shift is comparatively under-studied (Guo et al., 2017; Niculescu-Mizil & Caruana, 2005). Conformal prediction offers distribution-free coverage guarantees under exchangeability (Vovk, Gammerman, & Shafer, 2005), but these guarantees provably degrade under covariate shift, which has motivated weighted and adaptive variants (Tibshirani, Barber, Candès, & Ramdas, 2019). Large empirical benchmarks in this space, such as WILDS (Koh et al., 2021), focus mainly on image and text domains with synthetic or domain-generalization-style shift.
 
-**The gap this project targets:** comparatively little empirical work examines calibration, conformal prediction, and adaptation on tabular, survey-based healthcare data under naturally occurring temporal shift, rather than synthetic corruption. That combination — real-world shift, a classical tabular pipeline, and a healthcare application — is the specific, tractable niche this proposal occupies.
+Uncertainty for gradient-boosted trees specifically — the family this project's primary model belongs to — has its own literature, separate from the neural-network-focused work above (Malinin, Prokhorenkova, & Ustimenko, 2021). Closest to this project's actual design are two studies that split real EHR data (MIMIC-IV) into year groups to study temporal shift directly, rather than simulating it: Guo et al. (2022) benchmarks domain generalization/adaptation algorithms across four year groups on mortality, length-of-stay, sepsis, and ventilation prediction; Guo et al. (2023) shows that EHR foundation models pretrained across year groups improve robustness to the same kind of shift. Both use hospital EHR data rather than population survey data, and both center on adaptation rather than on whether the model's own uncertainty can be trusted to flag failure — which is where this project's contribution sits.
+
+**The gap this project targets:** comparatively little empirical work examines calibration, conformal prediction, and adaptation on tabular, survey-based healthcare data under naturally occurring temporal shift, rather than synthetic corruption or hospital EHR data. That combination — real-world population-survey shift, a classical tabular pipeline, and an explicit focus on uncertainty-as-failure-detector rather than just adaptation — is the specific, tractable niche this proposal occupies.
 
 ## 2. Research question and hypothesis
 
@@ -132,14 +134,19 @@ This project is framed as a rigorous applied/empirical study rather than a novel
 
 ## References
 
-- Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On Calibration of Modern Neural Networks. *Proceedings of ICML.*
-- Koh, P. W., Sagawa, S., Marklund, H., et al. (2021). WILDS: A Benchmark of in-the-Wild Distribution Shifts. *Proceedings of ICML.*
-- Niculescu-Mizil, A., & Caruana, R. (2005). Predicting Good Probabilities With Supervised Learning. *Proceedings of ICML.*
-- Ovadia, Y., Fertig, E., Ren, J., et al. (2019). Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in NeurIPS.*
-- Tibshirani, R. J., Barber, R. F., Candès, E. J., & Ramdas, A. (2019). Conformal Prediction Under Covariate Shift. *Advances in NeurIPS.*
-- Vovk, V., Gammerman, A., & Shafer, G. (2005). *Algorithmic Learning in a Random World.* Springer.
+*All entries below verified against primary sources (arXiv/DOI/publisher) during Phase 0 — no citation here is taken from memory alone.*
 
-*Full bibliographic details (venue, pages) to be verified against original sources during Phase 0, alongside 3–5 more recent papers to round out the review.*
+- Gal, Y., & Ghahramani, Z. (2016). Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning. *Proceedings of ICML*, PMLR 48:1050–1059.
+- Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On Calibration of Modern Neural Networks. *Proceedings of ICML*, PMLR 70:1321–1330. [arXiv:1706.04599](https://arxiv.org/abs/1706.04599)
+- Guo, L. L., Pfohl, S. R., Fries, J., Johnson, A., Posada, J., Aftandilian, C., Shah, N., & Sung, L. (2022). Evaluation of Domain Generalization and Adaptation on Improving Model Robustness to Temporal Dataset Shift in Clinical Medicine. *Scientific Reports*, 12, 2726.
+- Guo, L. L., Steinberg, E., Fleming, S. L., Posada, J., Lemmon, J., Pfohl, S. R., Shah, N., Fries, J., & Sung, L. (2023). EHR Foundation Models Improve Robustness in the Presence of Temporal Distribution Shift. *Scientific Reports*, 13, 3767.
+- Koh, P. W., Sagawa, S., Marklund, H., Xie, S. M., Zhang, M., et al. (2021). WILDS: A Benchmark of in-the-Wild Distribution Shifts. *Proceedings of ICML.* [arXiv:2012.07421](https://arxiv.org/abs/2012.07421)
+- Lakshminarayanan, B., Pritzel, A., & Blundell, C. (2017). Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles. *Advances in NeurIPS 30*, 6402–6413.
+- Malinin, A., Prokhorenkova, L., & Ustimenko, A. (2021). Uncertainty in Gradient Boosting via Ensembles. *ICLR 2021.* [arXiv:2006.10562](https://arxiv.org/abs/2006.10562)
+- Niculescu-Mizil, A., & Caruana, R. (2005). Predicting Good Probabilities With Supervised Learning. *Proceedings of the 22nd ICML.* [DOI:10.1145/1102351.1102430](https://doi.org/10.1145/1102351.1102430)
+- Ovadia, Y., Fertig, E., Ren, J., Nado, Z., Sculley, D., Nowozin, S., Dillon, J. V., Lakshminarayanan, B., & Snoek, J. (2019). Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in NeurIPS 32.* [arXiv:1906.02530](https://arxiv.org/abs/1906.02530)
+- Tibshirani, R. J., Barber, R. F., Candès, E. J., & Ramdas, A. (2019). Conformal Prediction Under Covariate Shift. *Advances in NeurIPS 32*, 2526–2536. [arXiv:1904.06019](https://arxiv.org/abs/1904.06019)
+- Vovk, V., Gammerman, A., & Shafer, G. (2005). *Algorithmic Learning in a Random World.* Springer. ISBN 978-0-387-00152-4.
 
 ---
 

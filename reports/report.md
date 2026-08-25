@@ -55,12 +55,18 @@ Recalibrating on a small labeled sample closer to the test period (2021) monoton
 
 The central hypothesis — that calibrated/conformal uncertainty identifies unreliable predictions under shift, and that lightweight recalibration recovers lost calibration — holds up on this first pass, but the *shift itself* is smaller than the proposal anticipated (Section 9, Risk 1). That's a legitimate finding, not a setback: it says something real about how BRFSS-scale national survey data behaves over a 6-year, COVID-spanning window for this particular prediction task. It also sets up a natural next question — does a *larger* shift (a different geographic split, or comparing states with very different healthcare access) push these guarantees further, to where they visibly break down? That would make Risk 3's predicted conformal-coverage failure mode actually observable, which it isn't yet at this shift magnitude.
 
+This also positions the work relative to the closest prior study design: Guo et al. (2022, 2023) split MIMIC-IV hospital records into year groups to study the same kind of temporal shift, but their focus is whether *adaptation* (domain generalization, foundation-model pretraining) recovers performance — not whether the model's own uncertainty can be trusted to flag failure in the first place. That's the gap this project is aimed at, on a different data modality (national population survey, not hospital EHR).
+
 ## Limitations
 
 - Single train year (2017) rather than a multi-year training window — chosen to keep the pre/post-shift boundary clean, at the cost of a smaller effective training set (still ~438K rows, not a practical constraint here).
 - Missing values handled via median imputation fit on the training year only; more sophisticated imputation was judged not worth the added complexity given missingness rates are modest (<13% for every feature).
 - Fruit/vegetable intake and income were dropped from the feature set because their definitions changed across the study window in ways that would confound shift with questionnaire redesign — a reasonable trade-off, but it does mean the feature set is narrower than the full "Diabetes Health Indicators"-style set used elsewhere in the literature.
 - This is a methodological study of reliability, not a clinical claim — see the proposal's framing (Section 10).
+
+## In progress
+
+A deep-ensemble / MC-dropout baseline (`scripts/run_deep_ensemble.py`, implementing Lakshminarayanan et al. 2017 and Gal & Ghahramani 2016) is built and correctness-checked on CPU at small scale, but not yet run at the scale intended for the paper — that happens on Exea Labs' AMD Instinct MI300X once access is set up. No deep-ensemble numbers appear in the Results section above for that reason; the smoke-test numbers in `reports/deep_ensemble_results_smoketest.json` are a code check, not a result.
 
 ## Reproducing this
 
