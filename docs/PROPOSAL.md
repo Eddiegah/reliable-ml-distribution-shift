@@ -47,6 +47,14 @@ The original idea covered three shift types, five uncertainty methods, five adap
 | Evaluation | AUROC, AUPRC, Brier score, Expected Calibration Error, conformal coverage, risk–coverage curve | Add Fairlearn subgroup fairness analysis, out-of-distribution detection metrics |
 | Deliverable | Reproducible code repository + a short written report | Interactive dashboard; full paper draft for workshop/journal submission |
 
+**Update:** the lab has since confirmed an open-ended timeline and a full
+paper as the actual target deliverable, and is providing AMD Instinct
+MI300X access. That upgrades two extension items to core scope: the full
+paper, and a deep-learning uncertainty baseline (deep ensembles /
+MC-dropout, the comparison methods from Ovadia et al. 2019) trained on the
+MI300X — the classical baselines above still don't need a GPU and continue
+running on CPU.
+
 ## 4. Methodology by phase
 
 Total core timeline: roughly 8–11 weeks of focused work. This scales up or down depending on the program's actual duration — to confirm with the mentor at kickoff (see Section 11).

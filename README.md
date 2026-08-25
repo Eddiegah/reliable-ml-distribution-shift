@@ -60,8 +60,22 @@ decisions are made and documented rather than left as open questions:
   against the real files and completely lack the blood-pressure/cholesterol
   survey module that year, which would have confounded "distribution shift"
   with "missing feature." Full rationale in `src/data/brfss_schema.py`.
-- **Compute:** running entirely on local hardware so far; lab compute is
-  available on request if a later stage needs it.
+- **Compute:** classical baselines ran on local CPU (no GPU needed). Exea
+  Labs is providing AMD Instinct MI300X access for the deep-learning
+  uncertainty extension below, which does need it.
+- **Timeline:** open-ended — no fixed deadline from the lab.
+- **Deliverable:** a full paper, not just an internal report (Section 3 of
+  the proposal originally scoped this as a stretch goal; it's now the
+  confirmed target).
+
+## Acknowledgments
+
+This research is conducted with mentorship from **Avneh Singh Bhatia**
+(Exea Labs). GPU experiments (see below) run on **AMD Instinct MI300X**
+accelerators provided by AMD via Exea Labs. Full attribution will appear in
+the paper once those experiments are in — see `reports/report.md`'s
+Acknowledgments section, added at that point rather than claimed in advance
+of actually running on the hardware.
 
 ## Results (Phases 2–5, first pass)
 
