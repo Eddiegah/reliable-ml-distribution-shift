@@ -48,32 +48,65 @@ benchmarks. Grounded in:
 
 Full references and discussion in [`docs/PROPOSAL.md`](docs/PROPOSAL.md#1-background-and-related-work).
 
-## Status — open items before Phase 1
+## Status
 
-`configs/default.yaml` has a few fields marked `TBD`. These are confirmed with
-the lab before the pipeline runs on real data (see Section 11 of the proposal):
+The lab gave full latitude on target variable, years, and timeline, so those
+decisions are made and documented rather than left as open questions:
 
-- [ ] Target variable (which BRFSS diabetes field, and which years it's coded consistently)
-- [ ] Train / validation / test / adaptation-sample years
-- [ ] Total time horizon for the engagement (scales the phase estimates below)
+- **Target:** BRFSS diabetes indicator (`DIABETE3`/`DIABETE4` — renamed
+  partway through the study window, confirmed to share identical coding)
+- **Years:** 2017 (train) → 2019 (validation) → 2021 (adaptation sample) →
+  2023 (final test). Restricted to odd years only — 2018/2022 were checked
+  against the real files and completely lack the blood-pressure/cholesterol
+  survey module that year, which would have confounded "distribution shift"
+  with "missing feature." Full rationale in `src/data/brfss_schema.py`.
+- **Compute:** running entirely on local hardware so far; lab compute is
+  available on request if a later stage needs it.
+
+## Results (Phases 2–5, first pass)
+
+Run via `scripts/run_pipeline.py`, full numbers in
+[`reports/phase2-5_results.json`](reports/phase2-5_results.json):
+
+| | val (2019) | test (2023, +6 yrs) |
+|---|---|---|
+| XGBoost AUROC | 0.836 | 0.828 |
+| XGBoost ECE (raw) | 0.003 | 0.005 |
+| Conformal coverage (target 90%) | 90.0% | 89.7% |
+
+Headline finding so far: **the shift is real but mild** over this window —
+performance and calibration degrade only slightly from 2019 to 2023, and
+conformal coverage holds up close to its target rather than collapsing. This
+is one of the risks the proposal flagged (Section 9, Risk 1) rather than a
+setback: it's a legitimate result, and it sets up the more interesting
+question of whether a *larger* shift (different geography, or a longer time
+span) breaks these guarantees more visibly — a natural next step, not
+required for the core deliverable.
+
+The uncertainty signal itself is informative even under this mild shift:
+failure-detection AUROC of 0.815 on the 2023 test set means the model's own
+uncertainty meaningfully predicts which of its predictions are wrong.
+Recalibrating on a small 2021 sample (Phase 5) further tightens calibration
+(ECE 0.005 → 0.001) without hurting discrimination (AUROC unchanged) — the
+adaptation step works, even though there wasn't much calibration drift to
+fix in the first place.
 
 ## Roadmap
 
 | Phase | Focus | Entry point |
 |---|---|---|
 | 0 | Literature review | `docs/` |
-| 1 | Data acquisition & preprocessing | `src/data/acquire.py`, `src/data/preprocess.py` |
-| 2 | Baseline models (Logistic Regression, XGBoost) | `src/models/baselines.py` |
-| 3 | Distribution shift evaluation | `src/evaluation/metrics.py` (`performance_degradation`) |
-| 4 | Uncertainty quantification (calibration + conformal) | `src/uncertainty/` |
-| 5 | Adaptation & recovery | `src/adaptation/recalibrate.py` |
+| 1 | Data acquisition & preprocessing | `scripts/download_brfss.py`, `scripts/build_dataset.py` |
+| 2–5 | Baselines, shift eval, calibration/conformal, adaptation | `scripts/run_pipeline.py` |
 | 6 | Write-up | `reports/` |
 
-The model-agnostic parts (metrics, calibration, conformal prediction, baseline
-training) are implemented and ready to run. The BRFSS-specific parts of
-`src/data/` are intentionally left as documented stubs until the target
-variable and years are confirmed with the lab — filling those in is the first
-real task once Phase 0 wraps.
+## Quickstart
+
+```bash
+python scripts/download_brfss.py   # ~450 MB, four BRFSS years, public CDC data
+python scripts/build_dataset.py    # extract + clean -> data/processed/brfss_clean.parquet
+python scripts/run_pipeline.py     # baselines, shift eval, calibration, conformal, adaptation
+```
 
 ## Setup
 
@@ -101,6 +134,7 @@ pytest -v
 
 ```
 configs/          run configuration (target variable, years, seeds)
+scripts/          runnable entry points: download data, build dataset, run the full pipeline
 src/data/         acquisition + cleaning + temporal split
 src/models/       baseline training (Logistic Regression, XGBoost)
 src/uncertainty/  calibration, split conformal prediction, failure-detection metrics

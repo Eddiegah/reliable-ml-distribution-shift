@@ -1,14 +1,20 @@
-# Values marked TBD are open questions for the lab kickoff meeting
-# (see Section 11 of the research proposal). Fill these in before Phase 1.
+# The lab gave full latitude on target/years/timeline — decisions below,
+# with the rationale documented instead of a mentor sign-off.
 
 data:
   raw_dir: data/raw
   processed_dir: data/processed
-  target_variable: TBD        # e.g. BRFSS diabetes indicator (DIABETE3/DIABETE4 — name changed across years)
-  train_years: TBD            # e.g. [2015, 2016, 2017]
-  val_years: TBD               # e.g. [2018]
-  test_years: TBD              # later, shifted years — e.g. [2021, 2022]
-  adaptation_sample_years: TBD # small labeled slice from test_years, held out from final evaluation
+  # BRFSS diabetes indicator was renamed DIABETE3 -> DIABETE4 partway through
+  # this range; src/data/preprocess.py must resolve both to one column.
+  target_variable: DIABETE3_OR_4
+  # Restricted to odd years only: 2018/2022 were checked against the real
+  # files and completely lack the blood-pressure/cholesterol module that
+  # year (a BRFSS biennial rotation), so using either as the shifted/test
+  # year would confound "distribution shift" with "missing feature."
+  train_years: [2017]
+  val_years: [2019]                # +2 years — moderate shift
+  adaptation_sample_years: [2021]  # +4 years — small labeled recalibration sample
+  test_years: [2023]               # +6 years — final held-out evaluation, most shift
 
 model:
   seed: 42
