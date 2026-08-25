@@ -10,7 +10,7 @@ def test_train_baselines_returns_fitted_models_with_predict_proba():
 
     models = train_baselines(X, y, seed=0)
 
-    assert set(models.keys()) == {"logistic_regression", "xgboost"}
+    assert set(models.keys()) == {"logistic_regression", "random_forest", "xgboost"}
     for model in models.values():
         probs = model.predict_proba(X)[:, 1]
         assert probs.shape[0] == len(X)

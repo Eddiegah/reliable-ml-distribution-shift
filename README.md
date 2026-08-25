@@ -65,31 +65,23 @@ decisions are made and documented rather than left as open questions:
 
 ## Results (Phases 2–5, first pass)
 
-Run via `scripts/run_pipeline.py`, full numbers in
-[`reports/phase2-5_results.json`](reports/phase2-5_results.json):
+📊 Full write-up with figures: [`reports/report.md`](reports/report.md) · raw numbers: [`reports/phase2-5_results.json`](reports/phase2-5_results.json)
 
 | | val (2019) | test (2023, +6 yrs) |
 |---|---|---|
-| XGBoost AUROC | 0.836 | 0.828 |
+| XGBoost AUROC (best of 3 models tried) | 0.836 | 0.828 |
 | XGBoost ECE (raw) | 0.003 | 0.005 |
 | Conformal coverage (target 90%) | 90.0% | 89.7% |
+| Failure-detection AUROC | — | **0.815** |
 
-Headline finding so far: **the shift is real but mild** over this window —
-performance and calibration degrade only slightly from 2019 to 2023, and
-conformal coverage holds up close to its target rather than collapsing. This
-is one of the risks the proposal flagged (Section 9, Risk 1) rather than a
-setback: it's a legitimate result, and it sets up the more interesting
-question of whether a *larger* shift (different geography, or a longer time
-span) breaks these guarantees more visibly — a natural next step, not
-required for the core deliverable.
+![Risk-coverage curve](reports/figures/risk_coverage_curve.png)
 
-The uncertainty signal itself is informative even under this mild shift:
-failure-detection AUROC of 0.815 on the 2023 test set means the model's own
-uncertainty meaningfully predicts which of its predictions are wrong.
-Recalibrating on a small 2021 sample (Phase 5) further tightens calibration
-(ECE 0.005 → 0.001) without hurting discrimination (AUROC unchanged) — the
-adaptation step works, even though there wasn't much calibration drift to
-fix in the first place.
+Headline finding: **the shift is real but mild** over this window, and the
+model's uncertainty is genuinely informative regardless — restricting to its
+most-confident 20% of 2023 predictions yields under 1% error (full curve
+above). Recalibrating on a small 2021 sample tightens calibration further
+(ECE 0.005 → 0.001) at no cost to discrimination. See `reports/report.md`
+for the complete discussion, all four figures, and limitations.
 
 ## Roadmap
 
