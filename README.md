@@ -25,7 +25,7 @@ mechanism for flagging unreliable predictions, and lightweight recalibration
 is tested as the fix once shift is detected.
 
 📄 Full proposal: [`docs/PROPOSAL.md`](docs/PROPOSAL.md) (readable on GitHub) · [`docs/proposal.docx`](docs/proposal.docx) (formatted download)
-📝 **Paper draft:** [`docs/paper_draft.md`](docs/paper_draft.md) — all sections, including the AMD MI300X deep-ensemble results, reflect completed experiments on real data.
+📝 **Paper draft:** [`docs/paper_draft.md`](docs/paper_draft.md) (readable on GitHub) · [`docs/paper_draft.docx`](docs/paper_draft.docx) (formatted, with all figures embedded) — all sections, including the AMD MI300X deep-ensemble results, reflect completed experiments on real data.
 
 ---
 
@@ -136,7 +136,7 @@ correction it surfaced: weighted conformal prediction's effect on the West
 isn't "no effect," it's a small but statistically significant coverage
 *decrease*, meaning the method has a real cost even where there's little
 shift to correct for. See [`reports/report.md`](reports/report.md) for the
-complete discussion, all nine figures, and limitations.
+complete discussion, all eight figures, and limitations.
 
 ## Roadmap
 

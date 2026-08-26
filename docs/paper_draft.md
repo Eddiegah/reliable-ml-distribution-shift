@@ -1,7 +1,8 @@
 # Reliable Machine Learning Under Distribution Shift: Uncertainty-Aware Diabetes Risk Prediction from National Health Survey Data
 
 **Edmund Eric Gah**
-*Draft — all sections, including 4.5, now reflect completed experiments on real data.*
+*Independent researcher, mentored by Avneh Singh Bhatia at Exea Labs · gahedmund146@gmail.com*
+*All sections reflect completed experiments on real data. Prepared for mentor review ahead of a target-venue decision.*
 
 ## Abstract
 
@@ -18,7 +19,10 @@ Our contribution is empirical rather than methodological: we apply established t
 1. A 6-year temporal shift analysis (2017 train → 2019/2021/2023 evaluation) shows performance and calibration degrade only mildly on average.
 2. A subgroup fairness analysis shows that this average conceals a large age-related gap the aggregate evaluation misses entirely.
 3. A geographic shift analysis, isolated from time within a single year, shows geography to be a substantially larger shift than six years of time — large enough to measurably strain the conformal coverage guarantee.
-4. A weighted conformal prediction analysis shows that the theoretically-prescribed fix for that strain works, partially.
+4. A weighted conformal prediction analysis shows that the theoretically-prescribed fix for that strain works, partially — and reveals a small but real cost where no correction was needed.
+5. A deep-ensemble and MC-dropout comparison shows the central finding is not an artifact of gradient-boosted trees: a structurally different model family reaches the same discrimination ceiling and produces a comparably informative uncertainty signal.
+
+Every comparison above carries a 95% bootstrap confidence interval rather than being reported as a bare point estimate (Section 3.4) — a methodological choice that itself surfaced one correction to an earlier draft of this analysis, detailed in Section 4.4.
 
 ## 2. Related Work
 
