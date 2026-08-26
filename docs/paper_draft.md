@@ -144,7 +144,9 @@ Uncertainty-aware evaluation of a real diabetes-risk model under real distributi
 
 ## Acknowledgments
 
-This research is conducted with mentorship from Avneh Singh Bhatia (Exea Labs). The deep-ensemble and MC-dropout experiments in Section 4.5 ran on an AMD Instinct MI300X accelerator, provided by AMD via Exea Labs.
+This research is conducted with mentorship from Avneh Singh Bhatia at Exea Labs, who arranged access to an **AMD Instinct MI300X** accelerator, provided by **AMD**, for the deep-learning experiments in Section 4.5.
+
+That access mattered in a specific, honest way. This paper's neural-network baseline (a 10-member deep ensemble and MC-dropout network, 50 epochs each) is small by modern deep-learning standards, but it is precisely the experiment that a CPU-only research setup would have left as a reduced-scale correctness check rather than a full, paper-ready result — Section 4.5 would still read "pending" without it. The MI300X's compute made the full-scale run take minutes rather than hours, and the pre-configured ROCm/PyTorch environment meant the entire pipeline — clone, install, download data, train, evaluate — ran end-to-end within a single short session with no framework friction. The practical result: the paper's central finding, that uncertainty survives distribution shift, could be tested on a second, structurally different model family (Section 4.5) rather than resting on gradient-boosted trees alone. Our thanks to AMD and Exea Labs for making that possible.
 
 ## References
 

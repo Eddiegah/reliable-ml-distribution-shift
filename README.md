@@ -75,9 +75,18 @@ decisions are made and documented rather than left as open questions:
 
 ## Acknowledgments
 
-This research is conducted with mentorship from **Avneh Singh Bhatia**
-(Exea Labs). The deep-ensemble/MC-dropout experiments (see below) ran on an
-**AMD Instinct MI300X** accelerator, provided by AMD via Exea Labs.
+This research is conducted with mentorship from **Avneh Singh Bhatia** at
+**Exea Labs**, who arranged access to an **AMD Instinct MI300X**
+accelerator, provided by **AMD**, for the deep-learning experiments below.
+
+That access is why Section 4.5 (deep ensemble + MC-dropout) is a completed
+result instead of a CPU-only correctness check: the MI300X ran the
+full-scale 10-member, 50-epoch ensemble in minutes on a pre-configured
+ROCm/PyTorch environment that needed no setup friction, letting this
+project test its central finding — that uncertainty survives distribution
+shift — on a second, structurally different model family rather than
+resting on gradient-boosted trees alone. Thanks to AMD and Exea Labs for
+making that possible.
 
 ## Results (Phases 2–5, first pass)
 

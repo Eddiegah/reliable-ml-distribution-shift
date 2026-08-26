@@ -130,3 +130,9 @@ python scripts/run_deep_ensemble.py --epochs 50 --n-members 10   # needs a GPU t
 python scripts/make_deep_ensemble_figure.py
 python scripts/run_confidence_intervals.py   # bootstrap CIs for every number above except Section 4.5
 ```
+
+## Acknowledgments
+
+This research is conducted with mentorship from Avneh Singh Bhatia at Exea Labs, who arranged access to an AMD Instinct MI300X accelerator, provided by AMD, for the deep-ensemble/MC-dropout experiments.
+
+That access is why the deep-ensemble section above is a completed result rather than a CPU-only correctness check: the MI300X ran the full-scale 10-member, 50-epoch ensemble in minutes on a pre-configured ROCm/PyTorch environment with no setup friction, letting this project test its central finding on a second, structurally different model family instead of resting on gradient-boosted trees alone. Thanks to AMD and Exea Labs for making that possible.
