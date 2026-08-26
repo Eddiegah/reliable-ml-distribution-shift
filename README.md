@@ -25,7 +25,7 @@ mechanism for flagging unreliable predictions, and lightweight recalibration
 is tested as the fix once shift is detected.
 
 📄 Full proposal: [`docs/PROPOSAL.md`](docs/PROPOSAL.md) (readable on GitHub) · [`docs/proposal.docx`](docs/proposal.docx) (formatted download)
-📝 **Paper draft:** [`docs/paper_draft.md`](docs/paper_draft.md) (readable on GitHub) · [`docs/paper_draft.docx`](docs/paper_draft.docx) (formatted, with all figures embedded) — all sections, including the AMD MI300X deep-ensemble results, reflect completed experiments on real data.
+📝 **Paper draft:** [`docs/paper_draft.md`](docs/paper_draft.md) (readable on GitHub) · [`docs/paper_draft.docx`](docs/paper_draft.docx) (formatted Word) · [`docs/paper_latex/main.pdf`](docs/paper_latex/main.pdf) (typeset PDF) · [`docs/paper_latex/Gah_Reliable_ML_Paper_Overleaf.zip`](docs/paper_latex/Gah_Reliable_ML_Paper_Overleaf.zip) (upload directly to Overleaf to edit — e.g. to add a co-author) — all sections, including the AMD MI300X deep-ensemble results, reflect completed experiments on real data.
 
 ---
 

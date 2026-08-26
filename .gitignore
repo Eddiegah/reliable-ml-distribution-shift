@@ -23,3 +23,6 @@ experiments/*
 mlruns/
 
 .env
+
+# Office lock files (created while a .docx/.xlsx/.pptx is open)
+~$*
