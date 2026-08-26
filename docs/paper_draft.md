@@ -1,7 +1,7 @@
 # Reliable Machine Learning Under Distribution Shift: Uncertainty-Aware Diabetes Risk Prediction from National Health Survey Data
 
 **Edmund Eric Gah**
-*Draft — in progress. Section 4.5 (deep ensembles / MC-dropout) is pending the AMD MI300X run; everything else reflects completed experiments on real data.*
+*Draft — all sections, including 4.5, now reflect completed experiments on real data.*
 
 ## Abstract
 
@@ -34,7 +34,7 @@ The Behavioral Risk Factor Surveillance System (BRFSS) is a large annual US heal
 
 ### 3.2 Models
 
-Three baselines are trained: Logistic Regression as an interpretable linear reference, Random Forest, and XGBoost as the primary model — chosen for its established strength on tabular data, and confirmed empirically in Section 4.1 to be both the most accurate and the best-calibrated of the three. A deep ensemble and an MC-dropout network (Lakshminarayanan et al., 2017; Gal & Ghahramani, 2016) are implemented as a fourth comparison point (Section 4.5), pending evaluation at full scale on GPU hardware.
+Three baselines are trained: Logistic Regression as an interpretable linear reference, Random Forest, and XGBoost as the primary model — chosen for its established strength on tabular data, and confirmed empirically in Section 4.1 to be both the most accurate and the best-calibrated of the three. A ten-member deep ensemble and an MC-dropout network (Lakshminarayanan et al., 2017; Gal & Ghahramani, 2016), each trained for 50 epochs, provide a fourth comparison point (Section 4.5), trained on an AMD Instinct MI300X.
 
 ### 3.3 Uncertainty Quantification
 
@@ -105,9 +105,17 @@ Raw discrimination barely moves, echoing Section 4.1. Calibration and conformal 
 
 Weighting closes roughly half the South's coverage gap and nearly all of the Midwest's, at the cost of modestly larger prediction sets — the expected trade-off. For the West, where there was barely any gap, weighting has essentially no effect, a useful sanity check that the method does not manufacture a problem where none exists. It does not fully close the South's gap: the density-ratio estimate is only as good as the domain classifier estimating it, and this particular covariate shift is large.
 
-### 4.5 Deep Ensembles and MC-Dropout — *pending*
+### 4.5 Deep Ensembles and MC-Dropout
 
-A deep-ensemble and MC-dropout implementation (`scripts/run_deep_ensemble.py`) is complete and correctness-checked on CPU at reduced scale (3 epochs, 3 ensemble members: AUROC 0.826 on the 2023 test set, competitive with XGBoost). The full-scale run intended for this section requires the AMD Instinct MI300X access described in the Acknowledgments and has not yet been performed; no deep-ensemble numbers are reported as final results for that reason.
+| Model | AUROC (test 2023) | ECE, raw (test 2023) | Failure-detection AUROC |
+|---|---|---|---|
+| Deep ensemble (10 members) | 0.827 | 0.0099 | 0.800 (member disagreement) |
+| MC-dropout (single net) | — | — | 0.786 |
+| XGBoost (raw / calibrated) | 0.828 | 0.0054 | 0.815 (calibrated) |
+
+![Deep ensemble comparison](../reports/figures/deep_ensemble_comparison.png)
+
+Trained on an AMD Instinct MI300X (10 members, 50 epochs each), the deep ensemble matches XGBoost's discrimination almost exactly (AUROC 0.827 vs. 0.828) despite using none of gradient boosting's tree-structure inductive bias — a small MLP ensemble is enough to reach the same ceiling on this feature set. Its raw calibration is worse than XGBoost's raw calibration (ECE 0.0099 vs. 0.0054), consistent with Ovadia et al. (2019)'s finding that ensembles are reasonably but not perfectly calibrated out of the box. Ensemble disagreement — the variance across members' predictions — is a genuinely useful uncertainty signal (failure-detection AUROC 0.800), and outperforms MC-dropout on the same trained network (0.786), again consistent with the literature's general finding that ensembles give better-behaved uncertainty than dropout-based approximation alone. Both remain informative, in the same range as XGBoost's calibrated signal (0.815) from Section 4.1 — the finding that uncertainty survives this shift is not specific to gradient-boosted trees.
 
 ## 5. Discussion
 
@@ -116,6 +124,8 @@ The central pattern across Sections 4.1–4.4 is that **shift magnitude, not mer
 This has a direct methodological implication for how uncertainty-aware systems should be evaluated before deployment: a single shift axis, measured only in aggregate, is not sufficient evidence of reliability. The subgroup and geographic analyses here were comparatively cheap to run once the core pipeline existed — the marginal cost of checking multiple shift dimensions is small relative to the risk of missing the one that matters.
 
 The weighted conformal result (Section 4.4) is encouraging but incomplete in a specific, informative way: it demonstrates that the theoretically-correct response to detected covariate shift genuinely helps, while also demonstrating its limit — a simple domain classifier cannot fully correct for a shift this large from so few calibration examples. That gap is itself worth reporting, rather than papering over with a stronger domain classifier tuned to close it; a more expressive density-ratio estimator is a natural next step, but the honest finding at this stage is partial, not complete, recovery.
+
+The deep ensemble comparison (Section 4.5) adds one more piece to this picture: uncertainty surviving distribution shift is not an artifact specific to gradient-boosted trees. A neural network ensemble with no tree-structure inductive bias reaches the same discrimination ceiling as XGBoost and produces a comparably informative uncertainty signal via member disagreement, even though its raw calibration is worse out of the box. That the central finding replicates across two structurally different model families is modest additional evidence that it reflects something about the *data and shift*, rather than an idiosyncrasy of one algorithm.
 
 ## 6. Limitations
 
@@ -131,7 +141,7 @@ Uncertainty-aware evaluation of a real diabetes-risk model under real distributi
 
 ## Acknowledgments
 
-This research is conducted with mentorship from Avneh Singh Bhatia (Exea Labs). GPU experiments (Section 4.5) will run on AMD Instinct MI300X accelerators provided by AMD via Exea Labs once access is confirmed; that attribution and any resulting numbers will be added at that point, not claimed in advance of the hardware actually being used.
+This research is conducted with mentorship from Avneh Singh Bhatia (Exea Labs). The deep-ensemble and MC-dropout experiments in Section 4.5 ran on an AMD Instinct MI300X accelerator, provided by AMD via Exea Labs.
 
 ## References
 

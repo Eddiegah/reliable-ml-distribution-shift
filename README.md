@@ -25,7 +25,7 @@ mechanism for flagging unreliable predictions, and lightweight recalibration
 is tested as the fix once shift is detected.
 
 📄 Full proposal: [`docs/PROPOSAL.md`](docs/PROPOSAL.md) (readable on GitHub) · [`docs/proposal.docx`](docs/proposal.docx) (formatted download)
-📝 **Paper draft (in progress):** [`docs/paper_draft.md`](docs/paper_draft.md) — Abstract through Section 4.4 reflect completed experiments on real data; Section 4.5 (deep ensembles) is pending GPU access.
+📝 **Paper draft:** [`docs/paper_draft.md`](docs/paper_draft.md) — all sections, including the AMD MI300X deep-ensemble results, reflect completed experiments on real data.
 
 ---
 
@@ -65,9 +65,9 @@ decisions are made and documented rather than left as open questions:
   against the real files and completely lack the blood-pressure/cholesterol
   survey module that year, which would have confounded "distribution shift"
   with "missing feature." Full rationale in `src/data/brfss_schema.py`.
-- **Compute:** classical baselines ran on local CPU (no GPU needed). Exea
-  Labs is providing AMD Instinct MI300X access for the deep-learning
-  uncertainty extension below, which does need it.
+- **Compute:** classical baselines ran on local CPU (no GPU needed). The
+  deep-learning uncertainty extension ran on an AMD Instinct MI300X,
+  provided by AMD via Exea Labs.
 - **Timeline:** open-ended — no fixed deadline from the lab.
 - **Deliverable:** a full paper, not just an internal report (Section 3 of
   the proposal originally scoped this as a stretch goal; it's now the
@@ -76,11 +76,8 @@ decisions are made and documented rather than left as open questions:
 ## Acknowledgments
 
 This research is conducted with mentorship from **Avneh Singh Bhatia**
-(Exea Labs). GPU experiments (see below) run on **AMD Instinct MI300X**
-accelerators provided by AMD via Exea Labs. Full attribution will appear in
-the paper once those experiments are in — see `reports/report.md`'s
-Acknowledgments section, added at that point rather than claimed in advance
-of actually running on the hardware.
+(Exea Labs). The deep-ensemble/MC-dropout experiments (see below) ran on an
+**AMD Instinct MI300X** accelerator, provided by AMD via Exea Labs.
 
 ## Results (Phases 2–5, first pass)
 
@@ -114,9 +111,15 @@ worse, consistent with the South's well-documented higher diabetes
 prevalence. **Weighted conformal prediction (Tibshirani et al., 2019)
 recovers about half of that lost coverage** (South: 87.3% → 88.7%) at the
 cost of modestly larger prediction sets — the theoretically-prescribed fix
-works, partially, exactly as expected. See
-[`reports/report.md`](reports/report.md) for the complete discussion, all
-eight figures, and limitations.
+works, partially, exactly as expected.
+
+**And on the AMD MI300X, a deep ensemble matches XGBoost's accuracy with no
+tree-structure inductive bias at all:** AUROC 0.827 vs. 0.828 on the 2023
+test set, with ensemble disagreement giving a comparably useful uncertainty
+signal (failure-detection AUROC 0.800) that outperforms MC-dropout (0.786) —
+the central finding replicates across a structurally different model
+family. See [`reports/report.md`](reports/report.md) for the complete
+discussion, all nine figures, and limitations.
 
 ## Roadmap
 
@@ -125,8 +128,8 @@ eight figures, and limitations.
 | 0 | Literature review | `docs/` |
 | 1 | Data acquisition & preprocessing | `scripts/download_brfss.py`, `scripts/build_dataset.py` |
 | 2–5 | Baselines, shift eval, calibration/conformal, adaptation | `scripts/run_pipeline.py` |
-| ext. | Subgroup fairness, geographic shift, weighted conformal | `scripts/run_subgroup_analysis.py`, `scripts/run_geographic_shift.py`, `scripts/run_weighted_conformal.py` |
-| 6 | Write-up | `reports/` |
+| ext. | Subgroup fairness, geographic shift, weighted conformal, deep ensemble (MI300X) | `scripts/run_subgroup_analysis.py`, `scripts/run_geographic_shift.py`, `scripts/run_weighted_conformal.py`, `scripts/run_deep_ensemble.py` |
+| 6 | Write-up | `reports/`, `docs/paper_draft.md` |
 
 ## Quickstart
 
@@ -137,6 +140,7 @@ python scripts/run_pipeline.py      # baselines, shift eval, calibration, confor
 python scripts/run_subgroup_analysis.py   # extension: fairness by sex/age
 python scripts/run_geographic_shift.py    # extension: shift by US Census region
 python scripts/run_weighted_conformal.py  # extension: does reweighting recover the lost coverage?
+python scripts/run_deep_ensemble.py --epochs 50 --n-members 10  # extension: needs a GPU for reasonable runtime
 ```
 
 ## Setup

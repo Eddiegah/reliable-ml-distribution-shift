@@ -99,9 +99,19 @@ This also positions the work relative to the closest prior study design: Guo et 
 - Fruit/vegetable intake and income were dropped from the feature set because their definitions changed across the study window in ways that would confound shift with questionnaire redesign — a reasonable trade-off, but it does mean the feature set is narrower than the full "Diabetes Health Indicators"-style set used elsewhere in the literature.
 - This is a methodological study of reliability, not a clinical claim — see the proposal's framing (Section 10).
 
-## In progress
+## Deep ensemble / MC-dropout (AMD MI300X)
 
-A deep-ensemble / MC-dropout baseline (`scripts/run_deep_ensemble.py`, implementing Lakshminarayanan et al. 2017 and Gal & Ghahramani 2016) is built and correctness-checked on CPU at small scale, but not yet run at the scale intended for the paper — that happens on Exea Labs' AMD Instinct MI300X once access is set up. No deep-ensemble numbers appear in the Results section above for that reason; the smoke-test numbers in `reports/deep_ensemble_results_smoketest.json` are a code check, not a result.
+A 10-member deep ensemble and MC-dropout network (`scripts/run_deep_ensemble.py`, implementing Lakshminarayanan et al. 2017 and Gal & Ghahramani 2016), 50 epochs each, ran at full scale on an AMD Instinct MI300X provided by AMD via Exea Labs.
+
+![Deep ensemble comparison](figures/deep_ensemble_comparison.png)
+
+| Model | AUROC (test 2023) | ECE, raw (test 2023) | Failure-detection AUROC |
+|---|---|---|---|
+| Deep ensemble (10 members) | 0.827 | 0.0099 | 0.800 (member disagreement) |
+| MC-dropout (single net) | — | — | 0.786 |
+| XGBoost (raw / calibrated) | 0.828 | 0.0054 | 0.815 (calibrated) |
+
+The ensemble matches XGBoost's discrimination almost exactly despite no tree-structure inductive bias, confirming the earlier finding wasn't specific to gradient-boosted trees. Its raw calibration is worse than XGBoost's (expected — it wasn't post-hoc calibrated here), but ensemble disagreement is still a genuinely useful uncertainty signal, and outperforms MC-dropout on the same network — consistent with Ovadia et al. (2019)'s general finding. Full numbers in [`reports/deep_ensemble_results_full.json`](deep_ensemble_results_full.json); the earlier CPU smoke-test numbers in `reports/deep_ensemble_results_smoketest.json` were a correctness check only, superseded by this run.
 
 ## Reproducing this
 
@@ -116,4 +126,6 @@ python scripts/run_geographic_shift.py
 python scripts/make_geographic_figure.py
 python scripts/run_weighted_conformal.py
 python scripts/make_weighted_conformal_figure.py
+python scripts/run_deep_ensemble.py --epochs 50 --n-members 10   # needs a GPU to run in reasonable time
+python scripts/make_deep_ensemble_figure.py
 ```
