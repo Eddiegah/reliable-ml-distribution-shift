@@ -84,7 +84,7 @@ Given that geographic shift measurably breaks the coverage guarantee, does the f
 | South | 87.3% | **88.7%** | 1.07 → 1.11 |
 | West | 90.2% | 90.0% | 1.05 → 1.04 |
 
-Weighting closes roughly half the South's coverage gap (2.7 points → 1.3 points) and nearly all of the Midwest's (1.4 points → 0.4 points), at the cost of modestly larger prediction sets — the expected trade-off, since recovering coverage under shift means being less specific about which class is predicted. For the West, where there was barely any gap to begin with, weighting has essentially no effect either way, which is itself a useful sanity check: the method doesn't manufacture a problem where none exists. It doesn't fully close the South's gap, which makes sense — the density-ratio estimate is only as good as the domain classifier estimating it (here, a simple logistic regression on the same 15 features), and a two-region covariate shift this large is a genuinely hard estimation problem. Full numbers in [`reports/weighted_conformal_results.json`](weighted_conformal_results.json).
+Weighting closes roughly half the South's coverage gap (2.7 points → 1.3 points, improvement +0.0142 [95% CI 0.0135, 0.0148]) and nearly all of the Midwest's (1.4 points → 0.4 points, +0.0094 [0.0088, 0.0099]), at the cost of modestly larger prediction sets — the expected trade-off, since recovering coverage under shift means being less specific about which class is predicted. **Correction from an earlier draft:** for the West, where there was barely any gap to begin with, the bootstrap CI shows weighting does *not* have "essentially no effect" — it produces a small but statistically significant coverage *decrease* (−0.0021 [−0.0024, −0.0018], excludes zero). That's a more honest, more useful finding: reweighting carries a real (if small) cost even where there's little shift to correct for, so it should be applied selectively where shift is actually detected, not by default. It doesn't fully close the South's gap either way — the density-ratio estimate is only as good as the domain classifier estimating it (here, a simple logistic regression on the same 15 features), and a two-region covariate shift this large is a genuinely hard estimation problem. Full numbers in [`reports/weighted_conformal_results.json`](weighted_conformal_results.json) and [`reports/confidence_intervals.json`](confidence_intervals.json).
 
 ## Discussion
 
@@ -128,4 +128,5 @@ python scripts/run_weighted_conformal.py
 python scripts/make_weighted_conformal_figure.py
 python scripts/run_deep_ensemble.py --epochs 50 --n-members 10   # needs a GPU to run in reasonable time
 python scripts/make_deep_ensemble_figure.py
+python scripts/run_confidence_intervals.py   # bootstrap CIs for every number above except Section 4.5
 ```

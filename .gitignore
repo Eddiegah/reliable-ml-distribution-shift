@@ -12,6 +12,10 @@ data/raw/*
 data/processed/*
 !data/processed/.gitkeep
 
+# raw per-row prediction dumps (tens of MB, reproducible from a GPU rerun) -
+# the JSON summaries and figures derived from them are what's kept
+reports/*.npz
+
 # experiment logs / model artifacts
 experiments/*
 !experiments/.gitkeep

@@ -100,6 +100,17 @@ def main():
     out_path.write_text(json.dumps(results, indent=2))
     print(f"\nSaved to {out_path}")
 
+    # raw predictions, not just summary metrics — without these, a bootstrap
+    # CI on any of the numbers above needs a full GPU retrain to reconstruct
+    predictions_path = Path(f"reports/deep_ensemble_predictions_{args.tag}.npz")
+    np.savez(
+        predictions_path,
+        y_val=y_val, val_mean=val_mean,
+        y_test=y_test, test_mean=test_mean, test_per_member=test_per_member,
+        mc_samples=mc_samples,
+    )
+    print(f"Saved raw predictions to {predictions_path}")
+
 
 if __name__ == "__main__":
     main()

@@ -118,8 +118,16 @@ tree-structure inductive bias at all:** AUROC 0.827 vs. 0.828 on the 2023
 test set, with ensemble disagreement giving a comparably useful uncertainty
 signal (failure-detection AUROC 0.800) that outperforms MC-dropout (0.786) —
 the central finding replicates across a structurally different model
-family. See [`reports/report.md`](reports/report.md) for the complete
-discussion, all nine figures, and limitations.
+family.
+
+**Every headline number above now carries a 95% bootstrap confidence
+interval** (`scripts/run_confidence_intervals.py`), computed on the real
+data rather than left as bare point estimates — including one genuine
+correction it surfaced: weighted conformal prediction's effect on the West
+isn't "no effect," it's a small but statistically significant coverage
+*decrease*, meaning the method has a real cost even where there's little
+shift to correct for. See [`reports/report.md`](reports/report.md) for the
+complete discussion, all nine figures, and limitations.
 
 ## Roadmap
 
@@ -141,6 +149,7 @@ python scripts/run_subgroup_analysis.py   # extension: fairness by sex/age
 python scripts/run_geographic_shift.py    # extension: shift by US Census region
 python scripts/run_weighted_conformal.py  # extension: does reweighting recover the lost coverage?
 python scripts/run_deep_ensemble.py --epochs 50 --n-members 10  # extension: needs a GPU for reasonable runtime
+python scripts/run_confidence_intervals.py  # bootstrap CIs for every headline number above (CPU, ~a few minutes)
 ```
 
 ## Setup
