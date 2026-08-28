@@ -1,0 +1,44 @@
+{
+  "auroc_test": {
+    "point": 0.8272165656089783,
+    "ci_low": 0.8253642752766609,
+    "ci_high": 0.8286365762352943,
+    "n_boot": 300,
+    "n": 418492
+  },
+  "ece_raw_test": {
+    "point": 0.009788384695145263,
+    "ci_low": 0.008963583304789777,
+    "ci_high": 0.0107799514354055,
+    "n_boot": 300,
+    "n": 418492
+  },
+  "failure_detection_auroc_ensemble_disagreement": {
+    "point": 0.8001438399073166,
+    "ci_low": 0.7985433939641852,
+    "ci_high": 0.8016972173521293,
+    "n_boot": 300,
+    "n": 418492
+  },
+  "failure_detection_auroc_mc_dropout": {
+    "point": 0.7862056373759926,
+    "ci_low": 0.7843701674717221,
+    "ci_high": 0.7880528426032982,
+    "n_boot": 300,
+    "n": 418492
+  },
+  "failure_detection_gap_ensemble_minus_mc": {
+    "point": 0.013938202531324051,
+    "ci_low": 0.012918421110135825,
+    "ci_high": 0.014943409063075425,
+    "n_boot": 300,
+    "n": 418492
+  },
+  "auroc_gap_ensemble_minus_xgboost": {
+    "point": -0.00033891605641478417,
+    "ci_low": -0.0005674987701275502,
+    "ci_high": -0.00011215231997091239,
+    "n_boot": 300,
+    "n": 418492
+  }
+}

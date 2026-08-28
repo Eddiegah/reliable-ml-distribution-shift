@@ -123,14 +123,17 @@ cost of modestly larger prediction sets — the theoretically-prescribed fix
 works, partially, exactly as expected.
 
 **And on the AMD MI300X, a deep ensemble matches XGBoost's accuracy with no
-tree-structure inductive bias at all:** AUROC 0.827 vs. 0.828 on the 2023
-test set, with ensemble disagreement giving a comparably useful uncertainty
-signal (failure-detection AUROC 0.800) that outperforms MC-dropout (0.786) —
-the central finding replicates across a structurally different model
-family.
+tree-structure inductive bias at all:** AUROC 0.8272 [95% CI 0.8254, 0.8286]
+vs. XGBoost's 0.8275 — a paired gap of just −0.0003 that's technically
+significant only because of the 418K-row sample size, practically a tie.
+Ensemble disagreement gives a comparably useful uncertainty signal
+(failure-detection AUROC 0.800) that clearly beats MC-dropout (0.786, CIs
+don't overlap) — the central finding replicates across a structurally
+different model family, with the same statistical rigor as everything else.
 
-**Every headline number above now carries a 95% bootstrap confidence
-interval** (`scripts/run_confidence_intervals.py`), computed on the real
+**Every headline number in the paper now carries a 95% bootstrap confidence
+interval** (`scripts/run_confidence_intervals.py` +
+`scripts/run_confidence_intervals_deep_ensemble.py`), computed on the real
 data rather than left as bare point estimates — including one genuine
 correction it surfaced: weighted conformal prediction's effect on the West
 isn't "no effect," it's a small but statistically significant coverage

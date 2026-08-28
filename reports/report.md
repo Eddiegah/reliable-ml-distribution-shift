@@ -113,6 +113,14 @@ A 10-member deep ensemble and MC-dropout network (`scripts/run_deep_ensemble.py`
 
 The ensemble matches XGBoost's discrimination almost exactly despite no tree-structure inductive bias, confirming the earlier finding wasn't specific to gradient-boosted trees. Its raw calibration is worse than XGBoost's (expected — it wasn't post-hoc calibrated here), but ensemble disagreement is still a genuinely useful uncertainty signal, and outperforms MC-dropout on the same network — consistent with Ovadia et al. (2019)'s general finding. Full numbers in [`reports/deep_ensemble_results_full.json`](deep_ensemble_results_full.json); the earlier CPU smoke-test numbers in `reports/deep_ensemble_results_smoketest.json` were a correctness check only, superseded by this run.
 
+**Update — this section now has confidence intervals too.** A second GPU run (same seed, same script, now patched to also save raw predictions) confirmed the results essentially exactly and let `scripts/run_confidence_intervals_deep_ensemble.py` compute real 95% CIs:
+
+- AUROC (test 2023): 0.8272 [95% CI 0.8254, 0.8286] vs. XGBoost's 0.8275 — paired gap $-0.0003$ [$-0.0006$, $-0.0001$]. That excludes zero (detectable with 418K rows), but it's a practical tie.
+- ECE, raw: 0.0098 [0.0090, 0.0108]
+- Failure-detection AUROC: ensemble disagreement 0.8001 [0.7985, 0.8017] vs. MC-dropout 0.7862 [0.7844, 0.7881] — non-overlapping intervals, so ensemble disagreement being the better signal isn't a close call (gap +0.0139 [0.0129, 0.0149]).
+
+Full numbers in [`reports/confidence_intervals_deep_ensemble.json`](confidence_intervals_deep_ensemble.json). This was the one result in the paper without a CI; it no longer is.
+
 ## Reproducing this
 
 ```bash
@@ -128,7 +136,8 @@ python scripts/run_weighted_conformal.py
 python scripts/make_weighted_conformal_figure.py
 python scripts/run_deep_ensemble.py --epochs 50 --n-members 10   # needs a GPU to run in reasonable time
 python scripts/make_deep_ensemble_figure.py
-python scripts/run_confidence_intervals.py   # bootstrap CIs for every number above except Section 4.5
+python scripts/run_confidence_intervals.py   # bootstrap CIs for Sections 4.1-4.4
+python scripts/run_confidence_intervals_deep_ensemble.py   # bootstrap CIs for Section 4.5 (needs the .npz from the GPU run)
 ```
 
 ## Acknowledgments
