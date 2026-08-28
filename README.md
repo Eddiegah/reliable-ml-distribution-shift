@@ -4,152 +4,68 @@
 ![CI](https://github.com/Eddiegah/reliable-ml-distribution-shift/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-active--research-orange)
+![Status](https://img.shields.io/badge/status-paper--ready-brightgreen)
 
 **Does a model know when it might be wrong?**
 
-Machine-learning models can look excellent in development and still fail quietly
-in deployment — not by crashing, but by staying confidently wrong once the data
-they see no longer looks like the data they were trained on. In healthcare,
-that gap is dangerous: patient populations, practices, and data collection
-drift across time, geography, and demographics, and a model that can't tell
-you it's out of its depth is a model you can't trust.
+Machine-learning models can look excellent in development and still fail quietly in deployment, not by crashing, but by staying confidently wrong once the data they see no longer resembles the data they were trained on. In healthcare that gap is dangerous: patient populations, practices, and data collection drift across time, geography, and demographics, and a model that cannot signal when it is out of its depth is a model you cannot trust.
 
-This project trains diabetes-risk classifiers on the CDC's [Behavioral Risk
-Factor Surveillance System](https://www.cdc.gov/brfss/) (BRFSS), evaluates them
-under **real temporal distribution shift** (train on earlier survey years,
-test on later ones — not synthetic noise), and asks a sharper question than
-standard evaluation does: when the model's confidence is high, is it actually
-*earned*? Calibrated probabilities and conformal prediction are tested as the
-mechanism for flagging unreliable predictions, and lightweight recalibration
-is tested as the fix once shift is detected.
+This project trains diabetes-risk classifiers on the CDC's [Behavioral Risk Factor Surveillance System](https://www.cdc.gov/brfss/) (BRFSS) and evaluates them under three real, non-synthetic distribution shifts, temporal, demographic, and geographic, asking a sharper question than standard evaluation does: when the model is confident, is that confidence earned? Calibrated probabilities and conformal prediction are tested as the mechanism for flagging unreliable predictions, and weighted conformal prediction is tested as the remedy once shift is detected.
 
-📄 Full proposal: [`docs/PROPOSAL.md`](docs/PROPOSAL.md) (readable on GitHub) · [`docs/proposal.docx`](docs/proposal.docx) (formatted download)
-📝 **Paper draft:** [`docs/paper_draft.md`](docs/paper_draft.md) (readable on GitHub) · [`docs/paper_draft.docx`](docs/paper_draft.docx) (formatted Word) · [`docs/paper_latex/main.pdf`](docs/paper_latex/main.pdf) (typeset PDF) · [`docs/paper_latex/Gah_Reliable_ML_Paper_Overleaf.zip`](docs/paper_latex/Gah_Reliable_ML_Paper_Overleaf.zip) (upload directly to Overleaf to edit — e.g. to add a co-author) — all sections, including the AMD MI300X deep-ensemble results, reflect completed experiments on real data.
+## Paper
 
----
+| | |
+|---|---|
+| **Final PDF** | [`docs/paper_latex/main.pdf`](docs/paper_latex/main.pdf) |
+| **Overleaf package** (upload directly to edit, e.g. to add a co-author) | [`docs/paper_latex/Gah_Reliable_ML_Paper_Overleaf.zip`](docs/paper_latex/Gah_Reliable_ML_Paper_Overleaf.zip) |
+| **Markdown source** (readable on GitHub) | [`docs/paper_draft.md`](docs/paper_draft.md) |
+| **Word version** | [`docs/paper_draft.docx`](docs/paper_draft.docx) |
+| **Original research proposal** | [`docs/PROPOSAL.md`](docs/PROPOSAL.md) · [`docs/proposal.docx`](docs/proposal.docx) |
 
-## Research question
+Target venue: **ML4H 2026** (Machine Learning for Health Symposium), submission deadline September 10, 2026.
 
-> When a health-risk prediction model encounters distribution shift, can
-> uncertainty estimation reliably identify predictions that are likely to be
-> incorrect — and can adaptation methods restore reliable performance?
-
-## Related work
-
-This isn't the first study of ML reliability under shift — it targets a
-specific, underexplored corner of it: naturally occurring temporal shift in
-tabular healthcare survey data, rather than synthetic corruption on image/text
-benchmarks. Grounded in:
-
-- Ovadia et al. (2019), Lakshminarayanan et al. (2017), Gal & Ghahramani (2016) — uncertainty estimates (including deep ensembles and MC-dropout, both implemented here) degrade under dataset shift
-- Guo et al. (2017); Niculescu-Mizil & Caruana (2005) — post-hoc calibration is effective in-distribution, less studied under shift
-- Vovk, Gammerman & Shafer (2005); Tibshirani et al. (2019) — conformal prediction's coverage guarantees break under covariate shift
-- Koh et al. (2021) — WILDS, the standard shift benchmark, is mostly image/text
-- Malinin et al. (2021) — uncertainty specifically for gradient-boosted trees, this project's primary model family
-- Guo et al. (2022, 2023) — the closest prior design: MIMIC-IV split into year groups to study temporal shift directly, though on hospital EHR data and centered on adaptation rather than uncertainty-as-failure-detector
-
-All 11 references verified against primary sources (not from memory) — full
-list with arXiv/DOI links in
-[`docs/PROPOSAL.md`](docs/PROPOSAL.md#1-background-and-related-work).
-
-## Status
-
-The lab gave full latitude on target variable, years, and timeline, so those
-decisions are made and documented rather than left as open questions:
-
-- **Target:** BRFSS diabetes indicator (`DIABETE3`/`DIABETE4` — renamed
-  partway through the study window, confirmed to share identical coding)
-- **Years:** 2017 (train) → 2019 (validation) → 2021 (adaptation sample) →
-  2023 (final test). Restricted to odd years only — 2018/2022 were checked
-  against the real files and completely lack the blood-pressure/cholesterol
-  survey module that year, which would have confounded "distribution shift"
-  with "missing feature." Full rationale in `src/data/brfss_schema.py`.
-- **Compute:** classical baselines ran on local CPU (no GPU needed). The
-  deep-learning uncertainty extension ran on an AMD Instinct MI300X,
-  provided by AMD via Exea Labs.
-- **Timeline:** open-ended — no fixed deadline from the lab.
-- **Deliverable:** a full paper, not just an internal report (Section 3 of
-  the proposal originally scoped this as a stretch goal; it's now the
-  confirmed target).
-
-## Acknowledgments
-
-This research is conducted with mentorship from **Avneh Singh Bhatia** at
-**Exea Labs**, who arranged access to an **AMD Instinct MI300X**
-accelerator, provided by **AMD**, for the deep-learning experiments below.
-
-That access is why Section 4.5 (deep ensemble + MC-dropout) is a completed
-result instead of a CPU-only correctness check: the MI300X ran the
-full-scale 10-member, 50-epoch ensemble in minutes on a pre-configured
-ROCm/PyTorch environment that needed no setup friction, letting this
-project test its central finding — that uncertainty survives distribution
-shift — on a second, structurally different model family rather than
-resting on gradient-boosted trees alone. Thanks to AMD and Exea Labs for
-making that possible.
-
-## Results (Phases 2–5, first pass)
-
-📊 Full write-up with figures: [`reports/report.md`](reports/report.md) · raw numbers: [`reports/phase2-5_results.json`](reports/phase2-5_results.json)
-
-| | val (2019) | test (2023, +6 yrs) |
-|---|---|---|
-| XGBoost AUROC (best of 3 models tried) | 0.836 | 0.828 |
-| XGBoost ECE (raw) | 0.003 | 0.005 |
-| Conformal coverage (target 90%) | 90.0% | 89.7% |
-| Failure-detection AUROC | — | **0.815** |
+## Key findings
 
 ![Risk-coverage curve](reports/figures/risk_coverage_curve.png)
 
-Headline finding: **the shift is real but mild on average**, and the
-model's uncertainty is genuinely informative regardless — restricting to its
-most-confident 20% of 2023 predictions yields under 1% error (full curve
-above). Recalibrating on a small 2021 sample tightens calibration further
-(ECE 0.005 → 0.001) at no cost to discrimination.
+| Analysis | Headline result |
+|---|---|
+| Temporal shift (2017 → 2023) | AUROC drop of 0.008 [95% CI 0.006, 0.010]: mild but statistically real |
+| Subgroup fairness | AUROC 0.836 (ages 18–44) vs. 0.750 (65+): a gap the aggregate number hides entirely |
+| Geographic shift (single year, region vs. region) | Conformal coverage drop roughly 9x larger than the full 6-year temporal shift |
+| Weighted conformal prediction | Recovers about half the coverage lost to geographic shift, at a small but real cost where no shift needed correcting |
+| Deep ensemble vs. XGBoost (AMD Instinct MI300X) | Statistically tied on AUROC; the uncertainty signal replicates across two structurally different model families |
 
-**But "mild" is an average that hides a real subgroup gap:** AUROC on the
-2023 test set falls from 0.836 (age 18–44) to 0.811 (45–64) to **0.750**
-(65+) — an equalized-odds difference 27x larger than the (negligible) gap by
-sex.
+Every number above carries a 95% bootstrap confidence interval rather than being reported as a bare point estimate. Full method, all eight figures, and discussion are in the [paper](docs/paper_latex/main.pdf).
 
-**And geography, isolated from time, is a genuinely larger shift than 6
-years was:** training on Northeast respondents (2023) and evaluating on the
-South, conformal coverage drops 90.0% → **87.3%** — roughly 9x the drop seen
-under the full 6-year temporal shift — and calibration error is nearly 18x
-worse, consistent with the South's well-documented higher diabetes
-prevalence. **Weighted conformal prediction (Tibshirani et al., 2019)
-recovers about half of that lost coverage** (South: 87.3% → 88.7%) at the
-cost of modestly larger prediction sets — the theoretically-prescribed fix
-works, partially, exactly as expected.
+## Research question
 
-**And on the AMD MI300X, a deep ensemble matches XGBoost's accuracy with no
-tree-structure inductive bias at all:** AUROC 0.8272 [95% CI 0.8254, 0.8286]
-vs. XGBoost's 0.8275 — a paired gap of just −0.0003 that's technically
-significant only because of the 418K-row sample size, practically a tie.
-Ensemble disagreement gives a comparably useful uncertainty signal
-(failure-detection AUROC 0.800) that clearly beats MC-dropout (0.786, CIs
-don't overlap) — the central finding replicates across a structurally
-different model family, with the same statistical rigor as everything else.
+> When a health-risk prediction model encounters distribution shift, can uncertainty estimation reliably identify predictions that are likely to be incorrect, and can a known remedy restore reliable coverage once it degrades?
 
-**Every headline number in the paper now carries a 95% bootstrap confidence
-interval** (`scripts/run_confidence_intervals.py` +
-`scripts/run_confidence_intervals_deep_ensemble.py`), computed on the real
-data rather than left as bare point estimates — including one genuine
-correction it surfaced: weighted conformal prediction's effect on the West
-isn't "no effect," it's a small but statistically significant coverage
-*decrease*, meaning the method has a real cost even where there's little
-shift to correct for. See [`reports/report.md`](reports/report.md) for the
-complete discussion, all eight figures, and limitations.
+## Related work
 
-## Roadmap
+This targets a specific, underexplored corner of ML reliability: naturally occurring distribution shift in tabular healthcare survey data, rather than synthetic corruption on image or text benchmarks. Grounded in:
 
-| Phase | Focus | Entry point |
-|---|---|---|
-| 0 | Literature review | `docs/` |
-| 1 | Data acquisition & preprocessing | `scripts/download_brfss.py`, `scripts/build_dataset.py` |
-| 2–5 | Baselines, shift eval, calibration/conformal, adaptation | `scripts/run_pipeline.py` |
-| ext. | Subgroup fairness, geographic shift, weighted conformal, deep ensemble (MI300X) | `scripts/run_subgroup_analysis.py`, `scripts/run_geographic_shift.py`, `scripts/run_weighted_conformal.py`, `scripts/run_deep_ensemble.py` |
-| 6 | Write-up | `reports/`, `docs/paper_draft.md` |
+- Ovadia et al. (2019), Lakshminarayanan et al. (2017), Gal & Ghahramani (2016): uncertainty estimates, including deep ensembles and MC-dropout (both implemented here), degrade under dataset shift
+- Guo et al. (2017); Niculescu-Mizil & Caruana (2005): post-hoc calibration is effective in-distribution but less studied under shift
+- Vovk, Gammerman & Shafer (2005); Tibshirani et al. (2019): conformal prediction's coverage guarantees break under covariate shift
+- Koh et al. (2021): WILDS, the standard shift benchmark, is mostly image and text
+- Malinin et al. (2021): uncertainty specifically for gradient-boosted trees, this project's primary model family
+- Guo et al. (2022, 2023): the closest prior design, splitting MIMIC-IV into year groups to study temporal shift directly, though on hospital EHR data and centered on adaptation rather than uncertainty-as-failure-detector
+
+All 11 references are verified against primary sources. Full list with arXiv/DOI links in the [paper's references](docs/paper_draft.md#references).
+
+## Data and decisions
+
+- **Target:** BRFSS diabetes indicator (`DIABETE3`/`DIABETE4`, renamed partway through the study window; confirmed to share identical coding)
+- **Years:** 2017 (train) → 2019 (validation) → 2021 (adaptation sample) → 2023 (final test). Restricted to odd years: 2018 and 2022 were checked against the real files and completely lack the blood-pressure/cholesterol survey module that year, which would have confounded "distribution shift" with "missing feature." Full rationale in [`src/data/brfss_schema.py`](src/data/brfss_schema.py).
+- **Compute:** classical baselines ran on local CPU. The deep-learning uncertainty extension ran on an AMD Instinct MI300X, provided by AMD via Exea Labs.
+
+## Acknowledgments
+
+This research was conducted with mentorship from **Avneh Singh Bhatia** at **Exea Labs**, who arranged access to an **AMD Instinct MI300X** accelerator, provided by **AMD**, for the deep-learning experiments in the paper.
+
+That access is why the deep-ensemble section is a completed result rather than a CPU-only correctness check: the MI300X ran the full-scale 10-member, 50-epoch ensemble in minutes on a pre-configured ROCm/PyTorch environment with no setup friction. That let this project test its central finding, that uncertainty survives distribution shift, on a second, structurally different model family rather than resting on gradient-boosted trees alone. Thanks to AMD and Exea Labs for making that possible.
 
 ## Quickstart
 
@@ -157,11 +73,12 @@ complete discussion, all eight figures, and limitations.
 python scripts/download_brfss.py    # ~450 MB, four BRFSS years, public CDC data
 python scripts/build_dataset.py     # extract + clean -> data/processed/brfss_clean.parquet
 python scripts/run_pipeline.py      # baselines, shift eval, calibration, conformal, adaptation
-python scripts/run_subgroup_analysis.py   # extension: fairness by sex/age
-python scripts/run_geographic_shift.py    # extension: shift by US Census region
-python scripts/run_weighted_conformal.py  # extension: does reweighting recover the lost coverage?
-python scripts/run_deep_ensemble.py --epochs 50 --n-members 10  # extension: needs a GPU for reasonable runtime
-python scripts/run_confidence_intervals.py  # bootstrap CIs for every headline number above (CPU, ~a few minutes)
+python scripts/run_subgroup_analysis.py   # fairness by sex/age
+python scripts/run_geographic_shift.py    # shift by US Census region
+python scripts/run_weighted_conformal.py  # does reweighting recover the lost coverage?
+python scripts/run_deep_ensemble.py --epochs 50 --n-members 10  # needs a GPU for reasonable runtime
+python scripts/run_confidence_intervals.py                 # bootstrap CIs, classical baselines
+python scripts/run_confidence_intervals_deep_ensemble.py   # bootstrap CIs, deep ensemble / MC-dropout
 ```
 
 ## Setup
@@ -176,9 +93,7 @@ pip install -r requirements.txt
 
 ## Development & tests
 
-All model-agnostic modules (metrics, calibration, conformal prediction,
-baseline training, adaptation, temporal splitting) are covered by a passing
-test suite — CI runs it on every push.
+All model-agnostic modules (metrics, calibration, conformal prediction, baseline training, adaptation, temporal splitting, bootstrap CIs) are covered by a passing test suite. CI runs it on every push.
 
 ```bash
 pip install -r requirements-dev.txt
@@ -190,27 +105,25 @@ pytest -v
 
 ```
 configs/          run configuration (target variable, years, seeds)
-scripts/          runnable entry points: download data, build dataset, run the full pipeline
-src/data/         acquisition + cleaning + temporal split
-src/models/       baseline training (Logistic Regression, XGBoost)
-src/uncertainty/  calibration, split conformal prediction, failure-detection metrics
+scripts/          runnable entry points: download data, build dataset, run each analysis
+src/data/         acquisition, cleaning, temporal split
+src/models/       baseline training (Logistic Regression, Random Forest, XGBoost) and neural models
+src/uncertainty/  calibration, split and weighted conformal prediction
 src/adaptation/   recalibration on a held-out target-period sample
-src/evaluation/   performance/calibration metrics, shift-degradation comparison
+src/evaluation/   performance/calibration metrics, subgroup and bootstrap analysis
 tests/            pytest suite for every model-agnostic module
 data/raw/         downloaded BRFSS files (gitignored)
 data/processed/   cleaned/split datasets (gitignored)
-reports/          final write-up and figures
-docs/             full proposal + literature review notes
+reports/          figures and result artifacts
+docs/             proposal, paper (Markdown, Word, and LaTeX/Overleaf), literature notes
 ```
 
 ## Contributors
 
 | | |
 |---|---|
-| **Edmund Eric Gah** | Researcher & maintainer — [gahedmund146@gmail.com](mailto:gahedmund146@gmail.com) |
-
-Contributions and mentor guidance welcome once the project is underway — open
-an issue or reach out directly.
+| **Edmund Eric Gah** | Researcher — [gahedmund146@gmail.com](mailto:gahedmund146@gmail.com) |
+| **Avneh Singh Bhatia** | Mentor, Exea Labs |
 
 ## License
 
