@@ -1,4 +1,4 @@
-# Reliable Machine Learning Under Distribution Shift: Uncertainty-Aware Diabetes Risk Prediction from National Health Survey Data
+# Reliable machine learning under distribution shift: Uncertainty-aware diabetes risk prediction from national health survey data
 
 **Edmund Eric Gah**
 *Independent researcher, mentored by Avneh Singh Bhatia at Exea Labs · gahedmund146@gmail.com*
@@ -9,7 +9,7 @@
 
 Machine-learning models evaluated only on held-out data from their own training distribution can look reliable and then fail silently once deployed, as patient populations and data-collection practices drift across time, geography, and demographic groups. This paper asks whether calibrated probabilities and conformal prediction reliably flag untrustworthy predictions of a health-risk model once its input distribution shifts, using diabetes-risk prediction on the U.S. Centers for Disease Control and Prevention's (CDC) Behavioral Risk Factor Surveillance System (BRFSS) as the application. Using three real, non-synthetic shift settings (a 6-year temporal shift from 2017 to 2023, demographic subgroups within it, and a single-year geographic shift across US Census regions), together with a fourth analysis testing whether a known remedy corrects the coverage loss found in the third, we find (1) aggregate temporal degradation in discrimination, measured by the area under the receiver operating characteristic curve (AUROC), is mild but statistically real (drop 0.0081, 95% confidence interval [CI]: 0.0057–0.0103), and this average conceals a substantially larger fairness gap by age (AUROC 0.836 at ages 18–44 versus 0.750 at 65+, gap 0.085 [0.078, 0.092]); (2) geographic shift, isolated from time, degrades calibration and conformal coverage far more than six years of temporal shift (90.0% to 87.3% for the South versus 90.0% to 89.7% temporally); (3) the model's uncertainty remains informative under every shift tested (failure-detection AUROC 0.80–0.82); and (4) weighted conformal prediction (Tibshirani et al., 2019) recovers roughly half the coverage lost to geographic shift, at a small but significant cost where no real shift needed correcting, a targeted remedy rather than a free default. All differences above are 95% bootstrap confidence intervals (300 resamples) excluding zero. Together these results argue that shift magnitude, not merely shift's presence, determines whether uncertainty-aware safeguards hold, and that evaluating only one shift dimension, or only in aggregate, can miss the failure modes that matter most.
 
-## Author Summary
+## Author summary
 
 Blood pressure, cholesterol, weight, and lifestyle survey answers can be used to predict a person's risk of diabetes, and machine learning models built from national health surveys do this reasonably well. But a model trained on data from one time period, one region, or one age group can quietly become less trustworthy when used on a different population, without ever admitting it is unsure, and in health settings a confidently wrong prediction is more dangerous than an uncertain one. Using survey data collected by the CDC across four years and every US region, we tested whether a diabetes-risk model's own confidence can be trusted to flag its likely mistakes as the population it sees changes over time, across age groups, and across geography. We found that the model's confidence generally does stay informative, but that some kinds of change, especially moving between US regions, strain it far more than six years of time ever did. We also tested a statistical fix for this problem and found that it helps, but only partly. Overall, our results suggest that health-risk models need to be checked against several different kinds of real-world change, not just one, before they can be trusted in practice.
 
@@ -29,7 +29,7 @@ Our contribution is empirical rather than methodological: we apply established t
 
 Every comparison above carries a 95% bootstrap confidence interval rather than being reported as a bare point estimate (Materials and Methods), a methodological choice that itself surfaced one correction to an earlier draft of this analysis, detailed in the Results.
 
-### Related Work
+### Related work
 
 Prior work shows that standard classifiers become both less accurate and poorly calibrated under dataset shift, and that common uncertainty estimates, including deep ensembles and MC-dropout, degrade in reliability precisely when they are needed most (Ovadia et al., 2019; Lakshminarayanan et al., 2017; Gal & Ghahramani, 2016). Post-hoc calibration methods such as Platt scaling and isotonic regression are effective in-distribution, but their behavior under shift is comparatively under-studied (Guo et al., 2017; Niculescu-Mizil & Caruana, 2005). Conformal prediction offers distribution-free coverage guarantees under exchangeability (Vovk, Gammerman, & Shafer, 2005), but these guarantees provably degrade under covariate shift, which has motivated weighted and adaptive variants (Tibshirani, Barber, Candès, & Ramdas, 2019), the method we apply directly in our fourth analysis. Large empirical benchmarks in this space, such as WILDS (Koh et al., 2021), focus mainly on image and text domains with synthetic or domain-generalization-style shift. Uncertainty for gradient-boosted trees specifically, our primary model family, has its own, separate literature (Malinin, Prokhorenkova, & Ustimenko, 2021).
 
@@ -37,7 +37,7 @@ Closest to our design are two studies that split real electronic health record (
 
 ## Results
 
-### Temporal Distribution Shift
+### Temporal distribution shift
 
 The table below reports AUROC and calibration, measured by Expected Calibration Error (ECE), in-distribution (2019) versus after six years of temporal shift (2023).
 
@@ -57,13 +57,13 @@ XGBoost is both the strongest performer and the best calibrated out of the box (
 
 Recalibrating on a small 2021 sample tightens calibration further (ECE 0.0054 to 0.0011) with no cost to discrimination (AUROC 0.8276 to 0.8275) (reliability diagram above), the expected behavior since recalibration reshapes probabilities without changing prediction ranking.
 
-### Subgroup Fairness Under Shift
+### Subgroup fairness under shift
 
 ![Subgroup AUROC](paper_latex/figures/subgroup_auroc.png)
 
 Broken out by subgroup on the 2023 test set (figure above), sex shows almost no gap (AUROC 0.830 female vs. 0.824 male; equalized-odds difference 0.005), but age band shows a substantial one: AUROC falls from 0.836 [95% CI 0.830, 0.842] (18–44) to 0.811 [0.808, 0.814] (45–64) to **0.750** [0.748, 0.753] (65+), a gap between the youngest and oldest bands of 0.0852 [0.0775, 0.0922], clearly excluding zero, and an equalized-odds difference of 0.138, roughly 27x the sex gap. The aggregate temporal result above does not surface this at all.
 
-### Geographic Distribution Shift
+### Geographic distribution shift
 
 The table below reports discrimination, calibration, and conformal coverage for XGBoost trained on Northeast respondents and evaluated by region.
 
@@ -78,7 +78,7 @@ The table below reports discrimination, calibration, and conformal coverage for 
 
 Raw discrimination barely moves in absolute terms, echoing the temporal result above, though the Northeast-vs-South AUROC gap of 0.0111 [95% CI 0.0021, 0.0204] does exclude zero, so even this small a difference is statistically real, not sampling noise. Calibration and conformal coverage tell the more consequential story: the South's conformal coverage drop (90.0% [0.8955, 0.9039] to 87.3% [0.8707, 0.8747], 2.7 points) is roughly 9x the drop under the full 6-year temporal shift, and its calibration error is nearly 18x worse than in-region. This aligns with an independently documented pattern: the Southern US has substantially higher diabetes prevalence than the Northeast (16.9% vs. about 12.3% in this data, consistent with the CDC's "diabetes belt"), so a model calibrated on the Northeast's lower base rate is systematically overconfident when applied to the South's higher one. Failure-detection AUROC still holds up reasonably everywhere (0.80–0.82).
 
-### Weighted Conformal Prediction
+### Weighted conformal prediction
 
 The table below reports conformal coverage before and after weighting, by region.
 
@@ -92,7 +92,7 @@ The table below reports conformal coverage before and after weighting, by region
 
 Weighting closes roughly half the South's coverage gap (+0.0142 [95% CI 0.0135, 0.0148]) and nearly all of the Midwest's (+0.0094 [0.0088, 0.0099]), at the cost of modestly larger prediction sets, the expected trade-off, and in both cases the improvement is clearly real, not noise. For the West, where there was barely any gap to begin with, the bootstrap CI reveals something more precise than "no effect": weighting produces a small but statistically significant *decrease* in coverage, −0.0021 [−0.0024, −0.0018]. That interval excludes zero too, so it isn't sampling noise either. Reweighting has a genuine, if small, cost even where there is little real shift to correct for, which is a more honest characterization than "no effect," and a useful practical caveat: weighted conformal prediction is not a free action to apply by default. It is a trade specifically worth making where the coverage gap is large enough to be worth the small risk of making things marginally worse where it isn't. It does not fully close the South's gap either way, since the density-ratio estimate is only as good as the domain classifier estimating it, and this particular covariate shift is large.
 
-### Deep Ensembles and MC-Dropout
+### Deep ensembles and MC-dropout
 
 The table below reports discrimination, calibration, and failure-detection AUROC for the deep ensemble and MC-dropout against XGBoost.
 
@@ -128,7 +128,7 @@ The deep ensemble comparison adds one more piece to this picture: uncertainty su
 
 Uncertainty-aware evaluation of a real diabetes-risk model under real distribution shift shows that calibration and conformal coverage are far more sensitive to shift magnitude than raw discrimination is, that this sensitivity is easy to miss when only one shift dimension or only the aggregate is examined, and that a theoretically-motivated fix for detected coverage loss (weighted conformal prediction) works, partially. The practical recommendation this supports is straightforward: evaluate uncertainty-aware systems across multiple, independent shift dimensions, not just time, before treating aggregate stability as evidence of reliability.
 
-## Materials and Methods
+## Materials and methods
 
 ### Dataset
 
@@ -138,17 +138,17 @@ The Behavioral Risk Factor Surveillance System (BRFSS) is a large annual US heal
 
 Three baselines are trained: Logistic Regression as an interpretable linear reference, Random Forest, and XGBoost as the primary model, chosen for its established strength on tabular data and confirmed empirically to be both the most accurate and the best-calibrated of the three. A ten-member deep ensemble and an MC-dropout network (Lakshminarayanan et al., 2017; Gal & Ghahramani, 2016), each trained for 50 epochs, provide a fourth comparison point, trained on an AMD Instinct MI300X.
 
-### Uncertainty Quantification
+### Uncertainty quantification
 
 Post-hoc calibration uses isotonic regression fit on a held-out split. Conformal prediction uses the split-conformal method with a least-ambiguous-set nonconformity score, targeting 90% coverage. Weighted conformal prediction reweights calibration nonconformity scores by an estimated covariate density ratio between the calibration and target domains, estimated via a logistic-regression domain classifier, following Tibshirani et al. (2019); with calibration sets in the tens of thousands, we use the standard large-sample simplification of dropping each test point's own (negligible) contribution to the normalizing constant, so a single weighted threshold is computed rather than one per test point.
 
-### Evaluation Metrics
+### Evaluation metrics
 
 Discrimination: AUROC. Calibration: Brier score and ECE. Uncertainty quality: conformal coverage and mean prediction-set size, and failure-detection AUROC, meaning whether a model's uncertainty score (here, distance from a 0.5 decision boundary) discriminates between its correct and incorrect predictions. Fairness: Fairlearn's demographic parity and equalized odds differences.
 
 **Statistical uncertainty.** Every comparison reported in the Results carries a 95% bootstrap confidence interval (300 resamples), since a paper about quantifying uncertainty should not report its own headline numbers as bare point estimates. Comparisons on the same rows under two conditions (e.g. weighted vs. unweighted conformal coverage) use a paired bootstrap, which is more powerful than treating them as independent; comparisons across different respondents (e.g. two age bands, or two regions) resample each side independently. A difference is described as "significant" only when its interval excludes zero.
 
-### Experimental Designs
+### Experimental designs
 
 **Temporal shift**: train on 2017, calibrate/validate on 2019, hold out a small recalibration sample from 2021, evaluate final performance on 2023, isolating a 6-year, COVID-spanning shift while keeping geography constant.
 
@@ -158,11 +158,11 @@ Discrimination: AUROC. Calibration: Brier score and ECE. Uncertainty quality: co
 
 **Weighted conformal prediction**: applied to the geographic-shift setup above, comparing unweighted and weighted conformal coverage for each out-of-region evaluation.
 
-## Data Availability
+## Data availability
 
 All data used in this study are publicly available from the CDC's Behavioral Risk Factor Surveillance System (BRFSS) at [https://www.cdc.gov/brfss/annual_data/annual_data.htm](https://www.cdc.gov/brfss/annual_data/annual_data.htm), for survey years 2017, 2019, 2021, and 2023. No access restrictions or usage agreements apply beyond the CDC's standard public-use terms. All data processing, modeling, and evaluation code, including the feature construction and schema decisions described in Materials and Methods, is publicly available at [https://github.com/Eddiegah/reliable-ml-distribution-shift](https://github.com/Eddiegah/reliable-ml-distribution-shift).
 
-## Ethics Statement
+## Ethics statement
 
 This study analyzes only publicly available, de-identified, aggregate survey data collected and released by the CDC. It does not involve identifiable private information, direct interaction with human participants, or any data collection by the authors. As such, this work does not constitute human subjects research requiring institutional review board approval, consistent with the public-use designation of the BRFSS dataset.
 
@@ -170,7 +170,7 @@ This study analyzes only publicly available, de-identified, aggregate survey dat
 
 This research received no direct financial funding. Computing resources, specifically access to an AMD Instinct MI300X accelerator, were provided in-kind by AMD via Exea Labs for the deep-learning experiments described in Materials and Methods. The funders had no role in study design, data collection and analysis, decision to publish, or preparation of the manuscript.
 
-## Competing Interests
+## Competing interests
 
 The authors have declared that no competing interests exist.
 
@@ -186,12 +186,12 @@ That access mattered in a specific, honest way. This paper's neural-network base
 
 - Gal, Y., & Ghahramani, Z. (2016). Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning. *Proceedings of ICML*, PMLR 48:1050–1059.
 - Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On Calibration of Modern Neural Networks. *Proceedings of ICML*, PMLR 70:1321–1330. [arXiv:1706.04599](https://arxiv.org/abs/1706.04599)
-- Guo, L. L., Pfohl, S. R., Fries, J., Johnson, A., Posada, J., Aftandilian, C., Shah, N., & Sung, L. (2022). Evaluation of Domain Generalization and Adaptation on Improving Model Robustness to Temporal Dataset Shift in Clinical Medicine. *Scientific Reports*, 12, 2726.
-- Guo, L. L., Steinberg, E., Fleming, S. L., Posada, J., Lemmon, J., Pfohl, S. R., Shah, N., Fries, J., & Sung, L. (2023). EHR Foundation Models Improve Robustness in the Presence of Temporal Distribution Shift. *Scientific Reports*, 13, 3767.
-- Koh, P. W., Sagawa, S., Marklund, H., Xie, S. M., Zhang, M., et al. (2021). WILDS: A Benchmark of in-the-Wild Distribution Shifts. *Proceedings of ICML.* [arXiv:2012.07421](https://arxiv.org/abs/2012.07421)
+- Guo, L. L., Pfohl, S. R., Fries, J., Johnson, A., Posada, J., Aftandilian, C., et al. (2022). Evaluation of Domain Generalization and Adaptation on Improving Model Robustness to Temporal Dataset Shift in Clinical Medicine. *Scientific Reports*, 12, 2726.
+- Guo, L. L., Steinberg, E., Fleming, S. L., Posada, J., Lemmon, J., Pfohl, S. R., et al. (2023). EHR Foundation Models Improve Robustness in the Presence of Temporal Distribution Shift. *Scientific Reports*, 13, 3767.
+- Koh, P. W., Sagawa, S., Marklund, H., Xie, S. M., Zhang, M., Balsubramani, A., et al. (2021). WILDS: A Benchmark of in-the-Wild Distribution Shifts. *Proceedings of ICML.* [arXiv:2012.07421](https://arxiv.org/abs/2012.07421)
 - Lakshminarayanan, B., Pritzel, A., & Blundell, C. (2017). Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles. *Advances in NeurIPS 30*, 6402–6413.
 - Malinin, A., Prokhorenkova, L., & Ustimenko, A. (2021). Uncertainty in Gradient Boosting via Ensembles. *ICLR 2021.* [arXiv:2006.10562](https://arxiv.org/abs/2006.10562)
 - Niculescu-Mizil, A., & Caruana, R. (2005). Predicting Good Probabilities With Supervised Learning. *Proceedings of the 22nd ICML.* [DOI:10.1145/1102351.1102430](https://doi.org/10.1145/1102351.1102430)
-- Ovadia, Y., Fertig, E., Ren, J., Nado, Z., Sculley, D., Nowozin, S., Dillon, J. V., Lakshminarayanan, B., & Snoek, J. (2019). Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in NeurIPS 32.* [arXiv:1906.02530](https://arxiv.org/abs/1906.02530)
+- Ovadia, Y., Fertig, E., Ren, J., Nado, Z., Sculley, D., Nowozin, S., et al. (2019). Can You Trust Your Model's Uncertainty? Evaluating Predictive Uncertainty Under Dataset Shift. *Advances in NeurIPS 32.* [arXiv:1906.02530](https://arxiv.org/abs/1906.02530)
 - Tibshirani, R. J., Barber, R. F., Candès, E. J., & Ramdas, A. (2019). Conformal Prediction Under Covariate Shift. *Advances in NeurIPS 32*, 2526–2536. [arXiv:1904.06019](https://arxiv.org/abs/1904.06019)
 - Vovk, V., Gammerman, A., & Shafer, G. (2005). *Algorithmic Learning in a Random World.* Springer. ISBN 978-0-387-00152-4.
