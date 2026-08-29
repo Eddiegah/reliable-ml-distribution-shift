@@ -82,9 +82,10 @@ Random Forest & 0.832 & 0.824 & 0.013 & 0.012 \\
 \centering
 \includegraphics[width=0.75\textwidth]{figures/roc_curves.png}
 \caption{ROC curves, in-distribution (2019) vs.\ shifted (2023), all three models.}
+\label{fig:roc-curves}
 \end{figure}
 
-XGBoost is both the strongest performer and the best calibrated out of the box. All three models degrade by roughly the same small amount ($\sim$0.01 AUROC) over six years; for XGBoost this degradation is 0.0081 [95\% CI 0.0057, 0.0103]. That is small in magnitude, but the interval excludes zero, so it is a real effect at this sample size, not noise. Split conformal prediction targeted 90\% coverage and achieved 89.7\% on the shifted 2023 test set, a drop of 0.0034 [0.0022, 0.0047], likewise small but real. Failure-detection AUROC is 0.815 [0.814, 0.817]: restricting to the most-confident 20\% of 2023 predictions yields under 1\% error (Fig~\ref{fig:risk-coverage}), meaning the model's confidence remains informative even under shift.
+XGBoost is both the strongest performer and the best calibrated out of the box (Fig~\ref{fig:roc-curves}). All three models degrade by roughly the same small amount ($\sim$0.01 AUROC) over six years; for XGBoost this degradation is 0.0081 [95\% CI 0.0057, 0.0103]. That is small in magnitude, but the interval excludes zero, so it is a real effect at this sample size, not noise. Split conformal prediction targeted 90\% coverage and achieved 89.7\% on the shifted 2023 test set, a drop of 0.0034 [0.0022, 0.0047], likewise small but real. Failure-detection AUROC is 0.815 [0.814, 0.817]: restricting to the most-confident 20\% of 2023 predictions yields under 1\% error (Fig~\ref{fig:risk-coverage}), meaning the model's confidence remains informative even under shift.
 
 \begin{figure}[h]
 \centering
@@ -97,9 +98,10 @@ XGBoost is both the strongest performer and the best calibrated out of the box. 
 \centering
 \includegraphics[width=0.6\textwidth]{figures/reliability_diagram.png}
 \caption{Reliability diagram: raw, calibrated, and recalibrated XGBoost on the 2023 test set.}
+\label{fig:reliability}
 \end{figure}
 
-Recalibrating on a small 2021 sample tightens calibration further (ECE 0.0054 $\to$ 0.0011) with no cost to discrimination (AUROC 0.8276 $\to$ 0.8275), the expected behavior since recalibration reshapes probabilities without changing prediction ranking.
+Recalibrating on a small 2021 sample tightens calibration further (ECE 0.0054 $\to$ 0.0011) with no cost to discrimination (AUROC 0.8276 $\to$ 0.8275) (Fig~\ref{fig:reliability}), the expected behavior since recalibration reshapes probabilities without changing prediction ranking.
 
 \subsection{Subgroup Fairness Under Shift}
 \label{sec:subgroup}
@@ -108,12 +110,15 @@ Recalibrating on a small 2021 sample tightens calibration further (ECE 0.0054 $\
 \centering
 \includegraphics[width=0.75\textwidth]{figures/subgroup_auroc.png}
 \caption{XGBoost (calibrated) AUROC by subgroup, shifted test set (2023).}
+\label{fig:subgroup}
 \end{figure}
 
-Broken out by subgroup on the 2023 test set, sex shows almost no gap (AUROC 0.830 female vs.\ 0.824 male; equalized-odds difference 0.005), but age band shows a substantial one: AUROC falls from 0.836 [95\% CI 0.830, 0.842] (18--44) to 0.811 [0.808, 0.814] (45--64) to \textbf{0.750} [0.748, 0.753] (65+), a gap between the youngest and oldest bands of 0.0852 [0.0775, 0.0922], clearly excluding zero, and an equalized-odds difference of 0.138, roughly 27x the sex gap. The aggregate temporal result in Section~\ref{sec:temporal} does not surface this at all.
+Broken out by subgroup on the 2023 test set (Fig~\ref{fig:subgroup}), sex shows almost no gap (AUROC 0.830 female vs.\ 0.824 male; equalized-odds difference 0.005), but age band shows a substantial one: AUROC falls from 0.836 [95\% CI 0.830, 0.842] (18--44) to 0.811 [0.808, 0.814] (45--64) to \textbf{0.750} [0.748, 0.753] (65+), a gap between the youngest and oldest bands of 0.0852 [0.0775, 0.0922], clearly excluding zero, and an equalized-odds difference of 0.138, roughly 27x the sex gap. The aggregate temporal result in Section~\ref{sec:temporal} does not surface this at all.
 
 \subsection{Geographic Distribution Shift}
 \label{sec:geographic}
+
+Table~\ref{tab:geographic} reports discrimination, calibration, and conformal coverage for XGBoost trained on Northeast respondents and evaluated by region.
 
 \begin{table}[h]
 \centering
@@ -128,18 +133,22 @@ West & 0.827 & 0.004 & 90.2\% \\
 \bottomrule
 \end{tabular}
 \caption{XGBoost trained on Northeast (2023), evaluated by region.}
+\label{tab:geographic}
 \end{table}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/geographic_shift.png}
 \caption{XGBoost trained on Northeast (2023), evaluated by region.}
+\label{fig:geographic}
 \end{figure}
 
-Raw discrimination barely moves in absolute terms, echoing Section~\ref{sec:temporal}, though the Northeast-vs-South AUROC gap of 0.0111 [95\% CI 0.0021, 0.0204] does exclude zero, so even this small a difference is statistically real, not sampling noise. Calibration and conformal coverage tell the more consequential story: the South's conformal coverage drop (90.0\% [0.8955, 0.9039] $\to$ 87.3\% [0.8707, 0.8747], 2.7 points) is roughly 9x the drop under the full 6-year temporal shift, and its calibration error is nearly 18x worse than in-region. This aligns with an independently documented pattern: the Southern US has substantially higher diabetes prevalence than the Northeast (16.9\% vs.\ $\sim$12.3\% in this data, consistent with the CDC's ``diabetes belt''), so a model calibrated on the Northeast's lower base rate is systematically overconfident when applied to the South's higher one. Failure-detection AUROC still holds up reasonably everywhere (0.80--0.82).
+Raw discrimination barely moves in absolute terms, echoing Section~\ref{sec:temporal}, though the Northeast-vs-South AUROC gap of 0.0111 [95\% CI 0.0021, 0.0204] does exclude zero, so even this small a difference is statistically real, not sampling noise. Calibration and conformal coverage tell the more consequential story (Fig~\ref{fig:geographic}): the South's conformal coverage drop (90.0\% [0.8955, 0.9039] $\to$ 87.3\% [0.8707, 0.8747], 2.7 points) is roughly 9x the drop under the full 6-year temporal shift, and its calibration error is nearly 18x worse than in-region. This aligns with an independently documented pattern: the Southern US has substantially higher diabetes prevalence than the Northeast (16.9\% vs.\ $\sim$12.3\% in this data, consistent with the CDC's ``diabetes belt''), so a model calibrated on the Northeast's lower base rate is systematically overconfident when applied to the South's higher one. Failure-detection AUROC still holds up reasonably everywhere (0.80--0.82).
 
 \subsection{Weighted Conformal Prediction}
 \label{sec:weighted-conformal}
+
+Table~\ref{tab:weighted} reports conformal coverage before and after weighting, by region.
 
 \begin{table}[h]
 \centering
@@ -153,18 +162,22 @@ West & 90.2\% & 90.0\% & 1.05 $\to$ 1.04 \\
 \bottomrule
 \end{tabular}
 \caption{Conformal coverage, unweighted vs.\ weighted, by region.}
+\label{tab:weighted}
 \end{table}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/weighted_conformal.png}
 \caption{Conformal coverage, unweighted vs.\ weighted, by region.}
+\label{fig:weighted}
 \end{figure}
 
-Weighting closes roughly half the South's coverage gap (+0.0142 [95\% CI 0.0135, 0.0148]) and nearly all of the Midwest's (+0.0094 [0.0088, 0.0099]), at the cost of modestly larger prediction sets, the expected trade-off, and in both cases the improvement is clearly real, not noise. For the West, where there was barely any gap to begin with, the bootstrap CI reveals something more precise than ``no effect'': weighting produces a small but statistically significant \emph{decrease} in coverage, $-0.0021$ [$-0.0024$, $-0.0018$]. That interval excludes zero too, so it isn't sampling noise either. Reweighting has a genuine, if small, cost even where there is little real shift to correct for, which is a more honest characterization than ``no effect,'' and a useful practical caveat: weighted conformal prediction is not a free action to apply by default. It is a trade specifically worth making where the coverage gap is large enough to be worth the small risk of making things marginally worse where it isn't. It does not fully close the South's gap either way, since the density-ratio estimate is only as good as the domain classifier estimating it, and this particular covariate shift is large.
+Weighting closes roughly half the South's coverage gap (+0.0142 [95\% CI 0.0135, 0.0148]) and nearly all of the Midwest's (+0.0094 [0.0088, 0.0099]), at the cost of modestly larger prediction sets (Fig~\ref{fig:weighted}), the expected trade-off, and in both cases the improvement is clearly real, not noise. For the West, where there was barely any gap to begin with, the bootstrap CI reveals something more precise than ``no effect'': weighting produces a small but statistically significant \emph{decrease} in coverage, $-0.0021$ [$-0.0024$, $-0.0018$]. That interval excludes zero too, so it isn't sampling noise either. Reweighting has a genuine, if small, cost even where there is little real shift to correct for, which is a more honest characterization than ``no effect,'' and a useful practical caveat: weighted conformal prediction is not a free action to apply by default. It is a trade specifically worth making where the coverage gap is large enough to be worth the small risk of making things marginally worse where it isn't. It does not fully close the South's gap either way, since the density-ratio estimate is only as good as the domain classifier estimating it, and this particular covariate shift is large.
 
 \subsection{Deep Ensembles and MC-Dropout}
 \label{sec:deep-ensemble}
+
+Table~\ref{tab:deep-ensemble} reports discrimination, calibration, and failure-detection AUROC for the deep ensemble and MC-dropout against XGBoost.
 
 \begin{table}[h]
 \centering
@@ -180,15 +193,17 @@ XGBoost (raw / calibrated) & 0.828 & 0.0054 & 0.815 (calibrated) \\
 \end{tabular}%
 }
 \caption{Deep ensemble / MC-dropout (AMD MI300X) vs.\ XGBoost, test 2023.}
+\label{tab:deep-ensemble}
 \end{table}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/deep_ensemble_comparison.png}
 \caption{Deep ensemble / MC-dropout (AMD MI300X) vs.\ XGBoost, test 2023.}
+\label{fig:deep-ensemble}
 \end{figure}
 
-Trained on an AMD Instinct MI300X (10 members, 50 epochs each), the deep ensemble matches XGBoost's discrimination almost exactly: AUROC 0.8272 [95\% CI 0.8254, 0.8286] vs.\ XGBoost's 0.8275, a paired gap of just $-0.0003$ [$-0.0006$, $-0.0001$]. That interval excludes zero, and with 418{,}492 test rows the difference is technically detectable, but a gap this small is practically a tie, and it is a tie despite the ensemble using none of gradient boosting's tree-structure inductive bias. Its raw calibration is worse than XGBoost's raw calibration (ECE 0.0098 [0.0090, 0.0108] vs.\ 0.0054), consistent with \citet{ovadia2019trust}'s finding that ensembles are reasonably but not perfectly calibrated out of the box. Ensemble disagreement, the variance across members' predictions, is a genuinely useful uncertainty signal (failure-detection AUROC 0.8001 [0.7985, 0.8017]), and outperforms MC-dropout on the same trained network (0.7862 [0.7844, 0.7881]) by 0.0139 [0.0129, 0.0149]. The intervals do not overlap, so this is not a close call, and it is consistent with the literature's general finding that ensembles give better-behaved uncertainty than dropout-based approximation alone. Both remain informative, in the same range as XGBoost's calibrated signal (0.815) from Section~\ref{sec:temporal}: the finding that uncertainty survives this shift is not specific to gradient-boosted trees, and it is now shown with the same statistical rigor as every other result in the paper.
+Trained on an AMD Instinct MI300X (10 members, 50 epochs each) (Fig~\ref{fig:deep-ensemble}), the deep ensemble matches XGBoost's discrimination almost exactly: AUROC 0.8272 [95\% CI 0.8254, 0.8286] vs.\ XGBoost's 0.8275, a paired gap of just $-0.0003$ [$-0.0006$, $-0.0001$]. That interval excludes zero, and with 418{,}492 test rows the difference is technically detectable, but a gap this small is practically a tie, and it is a tie despite the ensemble using none of gradient boosting's tree-structure inductive bias. Its raw calibration is worse than XGBoost's raw calibration (ECE 0.0098 [0.0090, 0.0108] vs.\ 0.0054), consistent with \citet{ovadia2019trust}'s finding that ensembles are reasonably but not perfectly calibrated out of the box. Ensemble disagreement, the variance across members' predictions, is a genuinely useful uncertainty signal (failure-detection AUROC 0.8001 [0.7985, 0.8017]), and outperforms MC-dropout on the same trained network (0.7862 [0.7844, 0.7881]) by 0.0139 [0.0129, 0.0149]. The intervals do not overlap, so this is not a close call, and it is consistent with the literature's general finding that ensembles give better-behaved uncertainty than dropout-based approximation alone. Both remain informative, in the same range as XGBoost's calibrated signal (0.815) from Section~\ref{sec:temporal}: the finding that uncertainty survives this shift is not specific to gradient-boosted trees, and it is now shown with the same statistical rigor as every other result in the paper.
 
 \section{Discussion}
 
@@ -240,7 +255,7 @@ Discrimination: AUROC. Calibration: Brier score and ECE. Uncertainty quality: co
 
 \textbf{Subgroup fairness} (Section~\ref{sec:subgroup}): the 2023 test set broken out by sex and a three-band age grouping (18--44, 45--64, 65+), checking whether the aggregate temporal result conceals a subgroup-specific one.
 
-\textbf{Geographic shift} (Section~\ref{sec:geographic}): to isolate geography from time, this analysis uses a \emph{single} year (2023) throughout. XGBoost is trained on Northeast respondents only (US Census region, mapped from BRFSS's state FIPS code against the official Census Bureau reference table), then evaluated on a held-out Northeast slice (in-region reference) versus the Midwest, South, and West (out-of-region).
+\textbf{Geographic shift} (Section~\ref{sec:geographic}): to isolate geography from time, this analysis uses a \emph{single} year (2023) throughout. XGBoost is trained on Northeast respondents only (US Census region, mapped from BRFSS's state Federal Information Processing Standards (FIPS) code against the official Census Bureau reference table), then evaluated on a held-out Northeast slice (in-region reference) versus the Midwest, South, and West (out-of-region).
 
 \textbf{Weighted conformal prediction} (Section~\ref{sec:weighted-conformal}): applied to the geographic-shift setup above, comparing unweighted and weighted conformal coverage for each out-of-region evaluation.
 

@@ -49,21 +49,23 @@ The table below reports AUROC and calibration, measured by Expected Calibration 
 
 ![ROC curves](paper_latex/figures/roc_curves.png)
 
-XGBoost is both the strongest performer and the best calibrated out of the box. All three models degrade by roughly the same small amount (about 0.01 AUROC) over six years; for XGBoost this degradation is 0.0081 [95% CI 0.0057, 0.0103]. That's small in magnitude, but the interval excludes zero, so it is a real effect at this sample size, not noise. Split conformal prediction targeted 90% coverage and achieved 89.7% on the shifted 2023 test set, a drop of 0.0034 [0.0022, 0.0047], likewise small but real. Failure-detection AUROC is 0.815 [0.814, 0.817]: restricting to the most-confident 20% of 2023 predictions yields under 1% error (risk-coverage curve below), meaning the model's confidence remains informative even under shift.
+XGBoost is both the strongest performer and the best calibrated out of the box (ROC curves above). All three models degrade by roughly the same small amount (about 0.01 AUROC) over six years; for XGBoost this degradation is 0.0081 [95% CI 0.0057, 0.0103]. That's small in magnitude, but the interval excludes zero, so it is a real effect at this sample size, not noise. Split conformal prediction targeted 90% coverage and achieved 89.7% on the shifted 2023 test set, a drop of 0.0034 [0.0022, 0.0047], likewise small but real. Failure-detection AUROC is 0.815 [0.814, 0.817]: restricting to the most-confident 20% of 2023 predictions yields under 1% error (risk-coverage curve below), meaning the model's confidence remains informative even under shift.
 
 ![Risk-coverage curve](paper_latex/figures/risk_coverage_curve.png)
 
 ![Reliability diagram](paper_latex/figures/reliability_diagram.png)
 
-Recalibrating on a small 2021 sample tightens calibration further (ECE 0.0054 to 0.0011) with no cost to discrimination (AUROC 0.8276 to 0.8275), the expected behavior since recalibration reshapes probabilities without changing prediction ranking.
+Recalibrating on a small 2021 sample tightens calibration further (ECE 0.0054 to 0.0011) with no cost to discrimination (AUROC 0.8276 to 0.8275) (reliability diagram above), the expected behavior since recalibration reshapes probabilities without changing prediction ranking.
 
 ### Subgroup Fairness Under Shift
 
 ![Subgroup AUROC](paper_latex/figures/subgroup_auroc.png)
 
-Broken out by subgroup on the 2023 test set, sex shows almost no gap (AUROC 0.830 female vs. 0.824 male; equalized-odds difference 0.005), but age band shows a substantial one: AUROC falls from 0.836 [95% CI 0.830, 0.842] (18–44) to 0.811 [0.808, 0.814] (45–64) to **0.750** [0.748, 0.753] (65+), a gap between the youngest and oldest bands of 0.0852 [0.0775, 0.0922], clearly excluding zero, and an equalized-odds difference of 0.138, roughly 27x the sex gap. The aggregate temporal result above does not surface this at all.
+Broken out by subgroup on the 2023 test set (figure above), sex shows almost no gap (AUROC 0.830 female vs. 0.824 male; equalized-odds difference 0.005), but age band shows a substantial one: AUROC falls from 0.836 [95% CI 0.830, 0.842] (18–44) to 0.811 [0.808, 0.814] (45–64) to **0.750** [0.748, 0.753] (65+), a gap between the youngest and oldest bands of 0.0852 [0.0775, 0.0922], clearly excluding zero, and an equalized-odds difference of 0.138, roughly 27x the sex gap. The aggregate temporal result above does not surface this at all.
 
 ### Geographic Distribution Shift
+
+The table below reports discrimination, calibration, and conformal coverage for XGBoost trained on Northeast respondents and evaluated by region.
 
 | Region | AUROC | ECE (calibrated on Northeast) | Conformal coverage (target 90%) |
 |---|---|---|---|
@@ -78,6 +80,8 @@ Raw discrimination barely moves in absolute terms, echoing the temporal result a
 
 ### Weighted Conformal Prediction
 
+The table below reports conformal coverage before and after weighting, by region.
+
 ![Weighted conformal](paper_latex/figures/weighted_conformal.png)
 
 | Region | Unweighted coverage | Weighted coverage | Mean set size (unweighted to weighted) |
@@ -89,6 +93,8 @@ Raw discrimination barely moves in absolute terms, echoing the temporal result a
 Weighting closes roughly half the South's coverage gap (+0.0142 [95% CI 0.0135, 0.0148]) and nearly all of the Midwest's (+0.0094 [0.0088, 0.0099]), at the cost of modestly larger prediction sets, the expected trade-off, and in both cases the improvement is clearly real, not noise. For the West, where there was barely any gap to begin with, the bootstrap CI reveals something more precise than "no effect": weighting produces a small but statistically significant *decrease* in coverage, −0.0021 [−0.0024, −0.0018]. That interval excludes zero too, so it isn't sampling noise either. Reweighting has a genuine, if small, cost even where there is little real shift to correct for, which is a more honest characterization than "no effect," and a useful practical caveat: weighted conformal prediction is not a free action to apply by default. It is a trade specifically worth making where the coverage gap is large enough to be worth the small risk of making things marginally worse where it isn't. It does not fully close the South's gap either way, since the density-ratio estimate is only as good as the domain classifier estimating it, and this particular covariate shift is large.
 
 ### Deep Ensembles and MC-Dropout
+
+The table below reports discrimination, calibration, and failure-detection AUROC for the deep ensemble and MC-dropout against XGBoost.
 
 | Model | AUROC (test 2023) | ECE, raw (test 2023) | Failure-detection AUROC |
 |---|---|---|---|
@@ -148,7 +154,7 @@ Discrimination: AUROC. Calibration: Brier score and ECE. Uncertainty quality: co
 
 **Subgroup fairness**: the 2023 test set broken out by sex and a three-band age grouping (18–44, 45–64, 65+), checking whether the aggregate temporal result conceals a subgroup-specific one.
 
-**Geographic shift**: to isolate geography from time, this analysis uses a *single* year (2023) throughout. XGBoost is trained on Northeast respondents only (US Census region, mapped from BRFSS's state FIPS code against the official Census Bureau reference table), then evaluated on a held-out Northeast slice (in-region reference) versus the Midwest, South, and West (out-of-region).
+**Geographic shift**: to isolate geography from time, this analysis uses a *single* year (2023) throughout. XGBoost is trained on Northeast respondents only (US Census region, mapped from BRFSS's state Federal Information Processing Standards (FIPS) code against the official Census Bureau reference table), then evaluated on a held-out Northeast slice (in-region reference) versus the Midwest, South, and West (out-of-region).
 
 **Weighted conformal prediction**: applied to the geographic-shift setup above, comparing unweighted and weighted conformal coverage for each out-of-region evaluation.
 
